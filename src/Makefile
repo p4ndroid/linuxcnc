@@ -170,17 +170,9 @@ SUBDIRS := \
     rtapi/examples/timer rtapi/examples/semaphore rtapi/examples/shmem \
     rtapi/examples/extint rtapi/examples/fifo rtapi/examples rtapi \
     \
-    hal/components hal/drivers hal/drivers/mesa-hostmot2 \
-    hal/user_comps/devices hal/user_comps/mb2hal \
-    hal/user_comps hal/user_comps/vismach hal/user_comps/vfs11_vfd hal/classicladder hal/utils hal \
-    hal/user_comps/vfdb_vfd hal/user_comps/wj200_vfd \
-    hal/user_comps/pi500_vfd \
-    hal/user_comps/huanyang-vfd \
-	hal/user_comps/xhc-whb04b-6 \
+    hal/components hal/utils hal \
     \
-    emc/usr_intf/axis emc/usr_intf/touchy emc/usr_intf/stepconf emc/usr_intf/pncconf \
-    emc/usr_intf/gremlin emc/usr_intf/gscreen emc/usr_intf/pyui emc/usr_intf/qtvcp \
-    emc/usr_intf/gmoccapy emc/usr_intf/qtplasmac emc/usr_intf/mdro\
+    emc/usr_intf/axis \
     emc/usr_intf emc/nml_intf emc/task emc/kinematics emc/tp emc/canterp \
     emc/motion emc/ini emc/rs274ngc emc/sai emc/pythonplugin \
     emc/motion-logger \
@@ -328,8 +320,6 @@ INFILES = \
 	../share/applications/linuxcnc.desktop \
 	../share/applications/linuxcnc-latency.desktop \
 	../share/applications/linuxcnc-latency-histogram.desktop \
-	../share/applications/linuxcnc-pncconf.desktop \
-	../share/applications/linuxcnc-stepconf.desktop \
 	../scripts/linuxcnc_var \
 	../scripts/halcmd_twopass \
 	../scripts/runtests \
@@ -393,8 +383,6 @@ SRCHEADERS := \
     emc/rs274ngc/saicanon.hh \
     emc/tooldata/tooldata.hh \
     hal/hal.h \
-    hal/hal_parport.h \
-    hal/drivers/mesa-hostmot2/hostmot2-serial.h \
     libnml/buffer/locmem.hh \
     libnml/buffer/memsem.hh \
     libnml/buffer/phantom.hh \
@@ -456,9 +444,6 @@ SRCHEADERS := \
     rtapi/rtapi_math_i386.h \
     rtapi/rtapi_math64.h \
     rtapi/rtapi_mutex.h \
-    rtapi/rtapi_parport.h \
-    rtapi/rtapi_pci.h \
-    rtapi/rtapi_slab.h \
     rtapi/rtapi_stdint.h \
     rtapi/rtapi_ctype.h \
     rtapi/rtapi_errno.h \
@@ -475,7 +460,6 @@ TARGETS += headers
 
 # Add converting of %.po files
 TARGETS += $(patsubst po/%.po, ../share/locale/%/LC_MESSAGES/linuxcnc.mo, $(wildcard po/*.po))
-TARGETS += $(patsubst po/gmoccapy/%.po, ../share/locale/%/LC_MESSAGES/gmoccapy.mo, $(wildcard po/gmoccapy/*.po))
 TARGETS += $(patsubst po/%.po, objects/%.msg, $(wildcard po/*.po))
 
 # tooledit as standalone app:
@@ -503,15 +487,6 @@ TARGETS += ../bin/pyngcgui
 	$(Q)(echo "#!$(PYTHON)")>|$@
 	$(Q)(echo "import pyngcgui")>>$@
 	$(Q)(echo "pyngcgui.standalone_pyngcgui()")>>$@
-	$(Q)chmod +x $@
-
-# gremlin_view as standalone app:
-TARGETS += ../bin/gremlin_view
-../bin/gremlin_view: Makefile
-	$(Q)rm -f $@
-	$(Q)(echo "#!$(PYTHON)")>|$@
-	$(Q)(echo "import gremlin_view")>>$@
-	$(Q)(echo "gremlin_view.standalone_gremlin_view()")>>$@
 	$(Q)chmod +x $@
 
 # halshow as standalone app:
@@ -629,8 +604,6 @@ XDGDESKTOP = \
     ../share/applications/linuxcnc.desktop \
     ../share/applications/linuxcnc-latency.desktop \
     ../share/applications/linuxcnc-latency-histogram.desktop \
-    ../share/applications/linuxcnc-pncconf.desktop \
-    ../share/applications/linuxcnc-stepconf.desktop \
 
 ifeq ($(RUN_IN_PLACE),yes)
 define ERROR_MESSAGE
@@ -678,19 +651,9 @@ install-dirs:
 		$(DESTDIR)$(localedir)/de/LC_MESSAGES \
 		$(DESTDIR)$(datadir)/axis/images \
 		$(DESTDIR)$(datadir)/axis/tcl \
-		$(DESTDIR)$(datadir)/gscreen/images \
-		$(DESTDIR)$(datadir)/gscreen/skins \
-		$(DESTDIR)$(datadir)/qtvcp/images \
-		$(DESTDIR)$(datadir)/qtvcp/screens \
-		$(DESTDIR)$(datadir)/qtvcp/panels \
-		$(DESTDIR)$(datadir)/qtvcp/widgets_ui \
-		$(DESTDIR)$(datadir)/gmoccapy/icons \
 		$(DESTDIR)$(datadir)/glade/catalogs \
 		$(DESTDIR)$(datadir)/glade/pixmaps/hicolor/22x22/actions \
 		$(DESTDIR)$(datadir)/gtksourceview-4/language-specs \
-		$(DESTDIR)$(datadir)/linuxcnc/stepconf \
-		$(DESTDIR)$(datadir)/linuxcnc/pncconf \
-		$(DESTDIR)$(datadir)/linuxcnc/pncconf/pncconf-help \
 		$(DESTDIR)$(datadir)/linuxcnc/hallib
 
 install-kernel-indep: install-dirs
@@ -746,71 +709,24 @@ install-kernel-indep: install-dirs
 	$(FILE) ../tcl/scripts/balloon.tcl ../tcl/scripts/emchelp.tcl $(DESTDIR)$(tcldir)/scripts
 	$(EXE) ../tcl/scripts/Set_Coordinates.tcl $(DESTDIR)$(tcldir)/scripts
 	$(FILE) ../share/linuxcnc/*.glade $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../share/linuxcnc/stepconf/*.glade $(DESTDIR)$(prefix)/share/linuxcnc/stepconf
-	$(FILE) ../share/linuxcnc/touchy.glade $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../share/linuxcnc/gscreen.glade $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../share/linuxcnc/gscreen2.glade $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../share/gmoccapy/gmoccapy.glade $(DESTDIR)$(prefix)/share/gmoccapy
-	$(FILE) ../share/linuxcnc/pncconf/*.glade $(DESTDIR)$(prefix)/share/linuxcnc/pncconf
-	$(FILE) ../share/linuxcnc/gremlin_view.ui $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../share/linuxcnc/popupkeyboard.ui $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../configs/common/linuxcnc.nml     $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../configs/common/linuxcnc_big.nml $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../src/emc/usr_intf/pncconf/pncconf-help/*.txt $(DESTDIR)$(prefix)/share/linuxcnc/pncconf/pncconf-help
-	$(FILE) ../src/emc/usr_intf/pncconf/pncconf-help/*.png $(DESTDIR)$(prefix)/share/linuxcnc/pncconf/pncconf-help
 
 	$(FILE) ../lib/python/gladevcp/hal_python.xml $(DESTDIR)$(datadir)/glade/catalogs/
 	$(FILE) ../share/glade/pixmaps/hicolor/22x22/actions/widget*.png  $(DESTDIR)$(datadir)/glade/pixmaps/hicolor/22x22/actions/
 
 	$(FILE) ../share/gtksourceview-4/language-specs/*.lang  $(DESTDIR)$(datadir)/gtksourceview-4/language-specs/
 
-	$(FILE) ../src/hal/drivers/mesa-hostmot2/modbus/*.tmpl  $(DESTDIR)$(prefix)/share/linuxcnc/
-
 install-kernel-indep: install-python
 install-python: install-dirs
 	$(DIR) $(DESTDIR)$(SITEPY) $(DESTDIR)$(SITEPY)/rs274
 	$(DIR) $(DESTDIR)$(SITEPY)/common
-	$(DIR) $(DESTDIR)$(SITEPY)/touchy
-	$(DIR) $(DESTDIR)$(SITEPY)/gscreen
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/designer/
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/writer
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/writer/ext
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/qtplasmac
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/qt_vismach
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/qt_ngcgui
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/qt_pdf
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/gcode_utility
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/plugins
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/widgets
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/widgets/widget_icons
-	$(DIR) $(DESTDIR)$(SITEPY)/gmoccapy
 	$(DIR) $(DESTDIR)$(SITEPY)/gladevcp
-	$(DIR) $(DESTDIR)$(SITEPY)/stepconf
-	$(DIR) $(DESTDIR)$(SITEPY)/pncconf
-	$(DIR) $(DESTDIR)$(SITEPY)/pyui
-	$(DIR) $(DESTDIR)$(SITEPY)/plasmac
 	$(FILE) ../lib/python/*.py ../lib/python/*.so $(DESTDIR)$(SITEPY)
 	$(FILE) ../lib/python/common/*.py $(DESTDIR)$(SITEPY)/common
 	$(FILE) ../lib/python/rs274/*.py $(DESTDIR)$(SITEPY)/rs274
-	$(FILE) ../lib/python/touchy/*.py $(DESTDIR)$(SITEPY)/touchy
-	$(FILE) ../lib/python/gscreen/*.py $(DESTDIR)$(SITEPY)/gscreen
-	$(FILE) ../lib/python/qtvcp/*.{py,ui,txt} $(DESTDIR)$(SITEPY)/qtvcp
-	$(FILE) ../lib/python/qtvcp/designer/*.txt $(DESTDIR)$(SITEPY)/qtvcp/designer
-	$(FILE) ../lib/python/qtvcp/widgets/*.py $(DESTDIR)$(SITEPY)/qtvcp/widgets
-	$(FILE) ../lib/python/qtvcp/widgets/widget_icons/*.{png,gif} $(DESTDIR)$(SITEPY)/qtvcp/widgets/widget_icons
-	$(FILE) ../lib/python/qtvcp/plugins/*.py $(DESTDIR)$(SITEPY)/qtvcp/plugins
-	$(TREE) ../lib/python/qtvcp/lib/* $(DESTDIR)$(SITEPY)/qtvcp/lib
-	$(FILE) ../lib/python/gmoccapy/*.py $(DESTDIR)$(SITEPY)/gmoccapy
 	$(FILE) ../lib/python/gladevcp/*.{py,png,glade} $(DESTDIR)$(SITEPY)/gladevcp
-	$(FILE) ../lib/python/stepconf/*.py $(DESTDIR)$(SITEPY)/stepconf
-	$(FILE) ../lib/python/pncconf/*.py $(DESTDIR)$(SITEPY)/pncconf
-	$(FILE) ../lib/python/pyui/*.py $(DESTDIR)$(SITEPY)/pyui
-	$(FILE) ../lib/python/plasmac/*.py $(DESTDIR)$(SITEPY)/plasmac
-	$(EXE) ../bin/stepconf $(DESTDIR)$(bindir)
-	$(EXE) ../bin/pncconf $(DESTDIR)$(bindir)
-	$(EXE) ../bin/pyui $(DESTDIR)$(bindir)
 	$(EXE) ../bin/hal_input $(DESTDIR)$(bindir)
 	$(EXE) ../bin/hal_bridge $(DESTDIR)$(bindir)
 	$(EXE) ../bin/mitsub_vfd $(DESTDIR)$(bindir)
@@ -827,25 +743,12 @@ install-python: install-dirs
 	$(EXE) ../bin/mdi $(DESTDIR)$(bindir)
 	$(EXE) ../bin/hal_manualtoolchange $(DESTDIR)$(bindir)
 	$(EXE) ../bin/image-to-gcode $(DESTDIR)$(bindir)
-	$(EXE) ../bin/touchy $(DESTDIR)$(bindir)
-	$(EXE) ../bin/gscreen $(DESTDIR)$(bindir)
-	$(EXE) ../bin/qtvcp $(DESTDIR)$(bindir)
-	$(EXE) ../lib/python/qtvcp/designer/install_script $(DESTDIR)$(SITEPY)/qtvcp/designer/
-	$(EXE) ../bin/gmoccapy $(DESTDIR)$(bindir)
+
 	$(EXE) ../bin/teach-in $(DESTDIR)$(bindir)
 	$(EXE) ../bin/scorbot-er-3 $(DESTDIR)$(bindir)
-	$(EXE) $(patsubst %.py,../bin/%,$(VISMACH_PY)) $(DESTDIR)$(bindir)
-	$(EXE) $(patsubst %.py,../bin/%,$(QTPLASMAC_PY)) $(DESTDIR)$(bindir)
 	$(FILE) ../share/linuxcnc/linuxcnc-wizard.gif $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../share/axis/images/*.{png,gif,xbm,ngc} $(DESTDIR)$(datadir)/axis/images
 	$(FILE) ../share/axis/tcl/*.tcl $(DESTDIR)$(datadir)/axis/tcl
-	$(FILE) ../share/gscreen/images/*.gif $(DESTDIR)$(datadir)/gscreen/images
-	$(TREE) ../share/gscreen/skins/* $(DESTDIR)$(datadir)/gscreen/skins
-	$(TREE) ../share/qtvcp/images/* $(DESTDIR)$(datadir)/qtvcp/images
-	$(TREE) ../share/qtvcp/screens/* $(DESTDIR)$(datadir)/qtvcp/screens
-	$(TREE) ../share/qtvcp/panels/* $(DESTDIR)$(datadir)/qtvcp/panels
-	$(TREE) ../share/qtvcp/widgets_ui/* $(DESTDIR)$(datadir)/qtvcp/widgets_ui
-	$(TREE) ../share/gmoccapy/icons/* $(DESTDIR)$(datadir)/gmoccapy/icons
 
 install-kernel-dep:
 	$(DIR)	$(DESTDIR)$(moduledir)/linuxcnc \
@@ -962,149 +865,6 @@ streamer-objs := hal/components/streamer.o $(MATHSTUB)
 obj-$(CONFIG_SAMPLER) += sampler.o
 sampler-objs := hal/components/sampler.o $(MATHSTUB)
 
-# Subdirectory: hal/drivers
-obj-$(CONFIG_HAL_PARPORT) += hal_parport.o
-hal_parport-objs := hal/drivers/hal_parport.o $(MATHSTUB)
-ifeq ($(X86ARCH),true)
-obj-$(CONFIG_HAL_SPEAKER) += hal_speaker.o
-hal_speaker-objs := hal/drivers/hal_speaker.o $(MATHSTUB)
-endif
-ifneq ($(BUILD_SYS),uspace)
-obj-$(CONFIG_PCI_8255) += pci_8255.o
-pci_8255-objs := hal/drivers/pci_8255.o
-obj-$(CONFIG_HAL_TIRO) += hal_tiro.o
-hal_tiro-objs := hal/drivers/hal_tiro.o $(MATHSTUB)
-obj-$(CONFIG_HAL_STG) += hal_stg.o
-hal_stg-objs := hal/drivers/hal_stg.o $(MATHSTUB)
-obj-$(CONFIG_HAL_VTI) += hal_vti.o
-hal_vti-objs := hal/drivers/hal_vti.o $(MATHSTUB)
-obj-$(CONFIG_HAL_EVOREG) += hal_evoreg.o
-hal_evoreg-objs := hal/drivers/hal_evoreg.o $(MATHSTUB)
-obj-$(CONFIG_HAL_MOTENC) += hal_motenc.o
-hal_motenc-objs := hal/drivers/hal_motenc.o $(MATHSTUB)
-obj-$(CONFIG_HAL_AX521H) += hal_ax5214h.o
-hal_ax5214h-objs := hal/drivers/hal_ax5214h.o $(MATHSTUB)
-obj-$(CONFIG_HAL_SKELETON) += hal_skeleton.o
-hal_skeleton-objs := hal/drivers/hal_skeleton.o $(MATHSTUB)
-obj-$(CONFIG_OPTO_AC5) += opto_ac5.o
-opto_ac5-objs := hal/drivers/opto_ac5.o $(MATHSTUB)
-endif
-obj-$(CONFIG_HAL_GM) += hal_gm.o
-hal_gm-objs := hal/drivers/hal_gm.o $(MATHSTUB)
-obj-$(CONFIG_HAL_PPMC) += hal_ppmc.o
-hal_ppmc-objs := hal/drivers/hal_ppmc.o $(MATHSTUB)
-
-#Don't attempt to build Pi / Beaglebone GPIO for RTAI
-ifeq ($(BUILD_SYS),uspace)
-obj-$(CONFIG_HAL_BB_GPIO) += hal_bb_gpio.o
-hal_bb_gpio-objs  :=			\
-    hal/drivers/hal_bb_gpio.o	\
-    $(MATHSTUB)
-obj-$(CONFIG_HAL_PI_GPIO) += hal_pi_gpio.o
-hal_pi_gpio-objs := 				\
-    hal/drivers/hal_pi_gpio.o 		\
-    hal/drivers/cpuinfo.o 		\
-    $(MATHSTUB)
-ifdef LIBGPIOD_VER
-obj-$(CONFIG_HAL_GPIO) += hal_gpio.o
-hal_gpio-objs  :=			\
-    hal/drivers/hal_gpio.o	        \
-    $(MATHSTUB)
-endif
-endif
-
-obj-$(CONFIG_HOSTMOT2) += hostmot2.o hm2_test.o hm2_pci.o hm2_7i43.o hm2_7i90.o setsserial.o
-obj-$(CONFIG_HOSTMOT2) += hm2_modbus.o
-ifeq ($(BUILD_SYS),uspace)
-obj-$(CONFIG_HOSTMOT2) += hm2_eth.o
-obj-$(CONFIG_HOSTMOT2) += hm2_spi.o hm2_rpspi.o hm2_spix.o
-endif
-hostmot2-objs :=			  \
-    hal/drivers/mesa-hostmot2/hostmot2.o  \
-    hal/drivers/mesa-hostmot2/abs_encoder.o\
-    hal/drivers/mesa-hostmot2/bitfile.o   \
-    hal/drivers/mesa-hostmot2/bspi.o	  \
-    hal/drivers/mesa-hostmot2/dpll.o	  \
-    hal/drivers/mesa-hostmot2/encoder.o   \
-    hal/drivers/mesa-hostmot2/inm.o	  \
-    hal/drivers/mesa-hostmot2/inmux.o	  \
-    hal/drivers/mesa-hostmot2/ioport.o	  \
-    hal/drivers/mesa-hostmot2/led.o	  \
-    hal/drivers/mesa-hostmot2/pins.o	  \
-    hal/drivers/mesa-hostmot2/pktuart.o   \
-    hal/drivers/mesa-hostmot2/pwmgen.o	  \
-    hal/drivers/mesa-hostmot2/oneshot.o	  \
-    hal/drivers/mesa-hostmot2/periodm.o	  \
-    hal/drivers/mesa-hostmot2/raw.o	  \
-    hal/drivers/mesa-hostmot2/rcpwmgen.o  \
-    hal/drivers/mesa-hostmot2/resolver.o  \
-    hal/drivers/mesa-hostmot2/sserial.o   \
-    hal/drivers/mesa-hostmot2/ssr.o       \
-    hal/drivers/mesa-hostmot2/outm.o      \
-    hal/drivers/mesa-hostmot2/stepgen.o   \
-    hal/drivers/mesa-hostmot2/tp_pwmgen.o \
-    hal/drivers/mesa-hostmot2/tram.o	  \
-    hal/drivers/mesa-hostmot2/uart.o	  \
-    hal/drivers/mesa-hostmot2/watchdog.o  \
-    hal/drivers/mesa-hostmot2/xy2mod.o    \
-    $(MATHSTUB)
-hm2_7i90-objs :=			  \
-    hal/drivers/mesa-hostmot2/hm2_7i90.o  \
-    hal/drivers/mesa-hostmot2/bitfile.o   \
-    $(MATHSTUB)
-hm2_7i43-objs :=			  \
-    hal/drivers/mesa-hostmot2/hm2_7i43.o  \
-    hal/drivers/mesa-hostmot2/bitfile.o   \
-    $(MATHSTUB)
-hm2_pci-objs  :=			  \
-    hal/drivers/mesa-hostmot2/hm2_pci.o   \
-    hal/drivers/mesa-hostmot2/bitfile.o   \
-    $(MATHSTUB)
-hm2_eth-objs  :=			  \
-    hal/drivers/mesa-hostmot2/hm2_eth.o   \
-    hal/drivers/mesa-hostmot2/eshellf.o   \
-    $(MATHSTUB)
-hm2_spi-objs  :=			  \
-    hal/drivers/mesa-hostmot2/hm2_spi.o   \
-    hal/drivers/mesa-hostmot2/llio_info.o \
-    $(MATHSTUB)
-hm2_rpspi-objs  :=			  \
-    hal/drivers/mesa-hostmot2/hm2_rpspi.o \
-    hal/drivers/mesa-hostmot2/llio_info.o \
-    hal/drivers/mesa-hostmot2/eshellf.o   \
-    $(MATHSTUB)
-hm2_spix-objs  :=			  \
-    hal/drivers/mesa-hostmot2/hm2_spix.o  \
-    hal/drivers/mesa-hostmot2/spix_rpi5.o \
-    hal/drivers/mesa-hostmot2/spix_rpi3.o \
-    hal/drivers/mesa-hostmot2/spix_spidev.o \
-    hal/drivers/mesa-hostmot2/llio_info.o \
-    hal/drivers/mesa-hostmot2/eshellf.o \
-    $(MATHSTUB)
-hm2_modbus-objs  :=			  \
-    hal/drivers/mesa-hostmot2/hm2_modbus.o \
-    $(MATHSTUB)
-hm2_test-objs :=			  \
-    hal/drivers/mesa-hostmot2/hm2_test.o  \
-    hal/drivers/mesa-hostmot2/bitfile.o   \
-    $(MATHSTUB)
-setsserial-objs :=			  \
-    hal/drivers/mesa-hostmot2/setsserial.o  \
-    $(MATHSTUB)
-
-obj-$(CONFIG_CLASSICLADDER_RT) += classicladder_rt.o
-classicladder_rt-objs := hal/classicladder/module_hal.o $(MATHSTUB)
-classicladder_rt-objs += hal/classicladder/arithm_eval.o
-classicladder_rt-objs += hal/classicladder/arrays.o
-classicladder_rt-objs += hal/classicladder/calc.o
-classicladder_rt-objs += hal/classicladder/calc_sequential.o
-classicladder_rt-objs += hal/classicladder/manager.o
-classicladder_rt-objs += hal/classicladder/symbols.o
-classicladder_rt-objs += hal/classicladder/vars_access.o
-
-ifdef SEQUENTIAL_SUPPORT
-classicladder_rt-objs += hal/classicladder/calc_sequential_rt.o
-endif
 
 obj-m += scope_rt.o
 scope_rt-objs := hal/utils/scope_rt.o $(MATHSTUB)
@@ -1293,7 +1053,6 @@ ifneq "$(filter normal uspace,$(BUILD_SYS))" ""
 ifneq "$(BUILD_SYS)" "uspace"
 ../rtlib/rtapi$(MODULE_EXT): $(addprefix objects/rt,$(rtapi-objs))
 endif
-../rtlib/classicladder_rt$(MODULE_EXT): $(addprefix objects/rt,$(classicladder_rt-objs))
 ../rtlib/boss_plc$(MODULE_EXT): $(addprefix objects/rt,$(boss_plc-objs))
 ../rtlib/debounce$(MODULE_EXT): $(addprefix objects/rt,$(debounce-objs))
 ../rtlib/encoder$(MODULE_EXT): $(addprefix objects/rt,$(encoder-objs))
@@ -1315,23 +1074,6 @@ endif
 ../rtlib/modmath$(MODULE_EXT): $(addprefix objects/rt,$(modmath-objs))
 ../rtlib/streamer$(MODULE_EXT): $(addprefix objects/rt,$(streamer-objs))
 ../rtlib/sampler$(MODULE_EXT): $(addprefix objects/rt,$(sampler-objs))
-../rtlib/hal_parport$(MODULE_EXT): $(addprefix objects/rt,$(hal_parport-objs))
-#../rtlib/uparport$(MODULE_EXT): $(addprefix objects/rt,$(uparport-objs))
-ifneq ($(BUILD_SYS),uspace)
-../rtlib/pci_8255$(MODULE_EXT): $(addprefix objects/rt,$(pci_8255-objs))
-../rtlib/hal_tiro$(MODULE_EXT): $(addprefix objects/rt,$(hal_tiro-objs))
-../rtlib/hal_stg$(MODULE_EXT): $(addprefix objects/rt,$(hal_stg-objs))
-../rtlib/hal_vti$(MODULE_EXT): $(addprefix objects/rt,$(hal_vti-objs))
-../rtlib/hal_evoreg$(MODULE_EXT): $(addprefix objects/rt,$(hal_evoreg-objs))
-../rtlib/hal_motenc$(MODULE_EXT): $(addprefix objects/rt,$(hal_motenc-objs))
-../rtlib/hal_ax5214h$(MODULE_EXT): $(addprefix objects/rt,$(hal_ax5214h-objs))
-../rtlib/hal_skeleton$(MODULE_EXT): $(addprefix objects/rt,$(hal_skeleton-objs))
-../rtlib/opto_ac5$(MODULE_EXT): $(addprefix objects/rt,$(opto_ac5-objs))
-endif
-../rtlib/hal_ppmc$(MODULE_EXT): $(addprefix objects/rt,$(hal_ppmc-objs))
-ifeq ($(X86ARCH),true)
-../rtlib/hal_speaker$(MODULE_EXT): $(addprefix objects/rt,$(hal_speaker-objs))
-endif
 ../rtlib/scope_rt$(MODULE_EXT): $(addprefix objects/rt,$(scope_rt-objs))
 ../rtlib/hal_lib$(MODULE_EXT): $(addprefix objects/rt,$(hal_lib-objs))
 ../rtlib/motmod$(MODULE_EXT): $(addprefix objects/rt,$(motmod-objs))
@@ -1348,25 +1090,6 @@ endif
 ../rtlib/rotarydeltakins$(MODULE_EXT): $(addprefix objects/rt,$(rotarydeltakins-objs))
 ../rtlib/rosekins$(MODULE_EXT): $(addprefix objects/rt,$(rosekins-objs))
 ../rtlib/scorbot-kins$(MODULE_EXT): $(addprefix objects/rt,$(scorbot-kins-objs))
-../rtlib/hal_gm$(MODULE_EXT): $(addprefix objects/rt,$(hal_gm-objs))
-../rtlib/hostmot2$(MODULE_EXT): $(addprefix objects/rt,$(hostmot2-objs))
-../rtlib/hm2_test$(MODULE_EXT): $(addprefix objects/rt,$(hm2_test-objs))
-../rtlib/hm2_pci$(MODULE_EXT): $(addprefix objects/rt,$(hm2_pci-objs))
-../rtlib/hm2_7i43$(MODULE_EXT): $(addprefix objects/rt,$(hm2_7i43-objs))
-../rtlib/hm2_7i90$(MODULE_EXT): $(addprefix objects/rt,$(hm2_7i90-objs))
-../rtlib/setsserial$(MODULE_EXT): $(addprefix objects/rt,$(setsserial-objs))
-../rtlib/hal_parport$(MODULE_EXT): $(addprefix objects/rt,$(hal_parport-objs))
-../rtlib/hal_ppmc$(MODULE_EXT): $(addprefix objects/rt,$(hal_ppmc-objs))
-../rtlib/hm2_eth$(MODULE_EXT): $(addprefix objects/rt,$(hm2_eth-objs))
-../rtlib/hm2_spi$(MODULE_EXT): $(addprefix objects/rt,$(hm2_spi-objs))
-../rtlib/hm2_rpspi$(MODULE_EXT): $(addprefix objects/rt,$(hm2_rpspi-objs))
-../rtlib/hm2_spix$(MODULE_EXT): $(addprefix objects/rt,$(hm2_spix-objs))
-../rtlib/hm2_modbus$(MODULE_EXT): $(addprefix objects/rt,$(hm2_modbus-objs))
-../rtlib/hal_bb_gpio$(MODULE_EXT): $(addprefix objects/rt,$(hal_bb_gpio-objs))
-../rtlib/hal_pi_gpio$(MODULE_EXT): $(addprefix objects/rt,$(hal_pi_gpio-objs))
-ifdef LIBGPIOD_VER
-../rtlib/hal_gpio$(MODULE_EXT): $(addprefix objects/rt,$(hal_gpio-objs))
-endif
 
 #----------------------------------------------------------------
 # SWITCHKINS

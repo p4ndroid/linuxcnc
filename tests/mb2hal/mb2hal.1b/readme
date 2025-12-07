@@ -1,1 +1,0 @@
-This test runs mb2hal im compatibility mode (means version = 1.0, not explicitly set) and compares the created pins (including types).

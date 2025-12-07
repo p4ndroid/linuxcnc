@@ -1,1 +1,0 @@
-../qtplasmac/qtplasmac_handler.py
