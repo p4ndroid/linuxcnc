@@ -1,0 +1,37 @@
+{
+  "artifacts": [
+    {
+      "file": "design.json",
+      "kind": "design",
+      "slug": "design"
+    },
+    {
+      "file": "plan.json",
+      "kind": "plan",
+      "slug": "plan"
+    },
+    {
+      "file": "reviews/design.json",
+      "kind": "review",
+      "rounds": [
+        1
+      ],
+      "target": "design",
+      "verb_reviewed": "design"
+    },
+    {
+      "file": "reviews/plan.json",
+      "kind": "review",
+      "rounds": [
+        1,
+        2
+      ],
+      "target": "plan",
+      "verb_reviewed": "plan"
+    }
+  ],
+  "created": "2026-06-11T12:59:51.529136Z",
+  "name": "nml-replacement-platform-prerequisite",
+  "type": "feat",
+  "uid": "feat-nml-replacement-platform-prerequisite-fz1h"
+}

@@ -1,0 +1,101 @@
+{
+  "body": {
+    "acceptance": [
+      "A fresh checkout of `/home/jan/projects/mce-platform` configures and builds with the same build-env/CMake helper model used by `/home/jan/projects/cstl`.",
+      "The repository builds only the initial modules `os`, `rt`, `loop`, `wire`, and `ipc` by default; `fs`, generic `platform`, Wayland, DRM, graphics, and input backends are absent or explicitly deferred.",
+      "The extracted `os`, `rt`, `loop`, `wire`, and `ipc` public headers remain under `include/mce/...` and their existing public symbols and documented return semantics remain compatible with the source subtree.",
+      "CMake target links for extracted modules resolve through the pinned `cstl` dependency and preserved aliases, and no target needs the full `mce-v2` tree.",
+      "Module tests for OS, RT, loop, wire/frame, IPC, seqlock, shared memory, and fd-passing behavior pass in the standalone repository.",
+      "A downstream CMake smoke project consumes pinned `cstl` plus `mce-platform`, links against the exported platform targets, and compiles a tiny program that includes representative IPC, wire, RT/seqlock, and OS headers.",
+      "The produced handoff identifies the exact pinned `mce-platform` revision LinuxCNC should consume before starting the NML replacement follow-up."
+    ],
+    "constraints": [
+      "The source platform invariants remain binding: public APIs return `int` with `0` success and `-errno` failure; Linux-specific syscalls are acceptable; loop add/mod/del operations run on the loop thread while only post/wakeup/stop are thread-safe; RT init may allocate/syscall while RT phase must avoid blocking calls, page faults, allocation, and non-RT libc.",
+      "`mce-platform` must not require the full `/home/jan/projects/mce-v2` tree to configure, build, test, or be consumed by a downstream project.",
+      "`cstl` is consumed by pinned reference, mirroring its documented pattern; it is not vendored into `mce-platform`.",
+      "The initial extraction must remain local-IPC and AXIS-follow-up oriented: IPC over Unix sockets, wire framing, fd passing, memfd/shared memory, and seqlock status snapshots are the capabilities to preserve.",
+      "The design is a prerequisite for LinuxCNC work; successful completion should produce a pinned repository revision and a clear handoff note for the later NML replacement plan."
+    ],
+    "decisions": [
+      {
+        "id": "D1",
+        "rationale": "The NML replacement prerequisite needs local IPC, wire framing, fd passing, shared memory, and seqlock support. Pulling in `fs`, the generic UI `platform` abstraction, Wayland, DRM, graphics, or input backends would expand dependency and test scope without serving the AXIS-focused LinuxCNC follow-up.",
+        "statement": "Create `/home/jan/projects/mce-platform` from the existing `/home/jan/projects/mce-v2/src/platform` code, but include only `os`, `rt`, `loop`, `wire`, and `ipc` in the initial standalone repository.",
+        "title": "Extract Only The LinuxCNC Prerequisite Modules"
+      },
+      {
+        "id": "D2",
+        "rationale": "`/home/jan/projects/cstl` already demonstrates the desired extraction shape from `mce-v2`: CMake 4.0, `BUILD_ENV` helper modules, module-level static libraries, preserved `mce::`/`mcl::` aliases, and a convenience aggregate target. Reusing that shape lowers integration risk for LinuxCNC and avoids creating a one-off build system.",
+        "statement": "Use the `cstl` repository pattern for `mce-platform`: standalone CMake project, `$BUILD_ENV`-provided helper modules, CTest integration, module subdirectories, preserved per-module aliases, and downstream consumption by pinned reference rather than vendoring.",
+        "title": "Model The Repository After cstl"
+      },
+      {
+        "id": "D3",
+        "rationale": "The existing platform modules link against `mce::result`, `mcl::alloc`, `mcl::mem`, `mcl::str`, `mcl::math`, `mcl::intern`, `mcl::container`, and `mcl::io`. `cstl` already exports these aliases while adding `cstl::cstl`, so `mce-platform` can sever the full `mce-v2` dependency without forcing LinuxCNC to learn renamed IPC, RT, or wire APIs.",
+        "statement": "Rewire extracted platform CMake links from in-tree `mce::result` and `mcl::*` providers to the exported `cstl` module targets while preserving the existing public headers, symbol prefixes, and module alias names exposed by the platform targets.",
+        "title": "Depend On cstl, Not mce-v2"
+      },
+      {
+        "id": "D4",
+        "rationale": "The source subtree's `AGENTS.md` documents these invariants and LinuxCNC will rely on predictable local IPC and realtime behavior. Preserving semantics makes this an extraction and dependency cleanup, not an API redesign hidden inside the prerequisite.",
+        "statement": "Keep the platform-layer public contract compatible with the source subtree: `int` return values use `0` for success and `-errno` for failure, Linux-specific syscalls remain acceptable, loop mutation APIs keep their thread-affinity rules, and RT code preserves the init-phase versus RT-phase restrictions.",
+        "title": "Preserve Platform API Semantics"
+      }
+    ],
+    "problem": "`docs/nml-replacement-plan.md` makes the first LinuxCNC NML replacement depend on a reusable local IPC/realtime platform library. The current implementation lives under `/home/jan/projects/mce-v2/src/platform`, where the needed modules are coupled to the larger `mce-v2` build. Before LinuxCNC changes begin, extract the needed platform layer into a standalone `/home/jan/projects/mce-platform` repository that can be tested, pinned, and consumed by downstream projects.",
+    "rejected": [
+      {
+        "id": "R1",
+        "option": "Begin by modifying LinuxCNC's NML transport directly inside this repository.",
+        "reason": "The prerequisite plan explicitly says LinuxCNC work depends on a completed and pinned platform repository. Starting here would either duplicate IPC primitives or couple LinuxCNC to an unstable extraction."
+      },
+      {
+        "id": "R2",
+        "option": "Vendor platform sources into LinuxCNC or the future LinuxCNC branch.",
+        "reason": "The requested model is `cstl`-style consumption by pinned reference. Vendoring would make updates harder to audit and would hide whether the platform library can stand alone."
+      },
+      {
+        "id": "R3",
+        "option": "Extract the whole `src/platform` tree, including `fs`, generic `platform`, Wayland, DRM, graphics, and input backends.",
+        "reason": "Those modules are not needed for the first AXIS-local NML replacement and would bring display/input dependencies and backend-selection concerns into a prerequisite whose immediate value is IPC and realtime shared memory."
+      }
+    ],
+    "scope": {
+      "in": [
+        "Create a standalone CMake repository at `/home/jan/projects/mce-platform` for the initial platform extraction.",
+        "Move or copy the `os`, `rt`, `loop`, `wire`, and `ipc` modules from `/home/jan/projects/mce-v2/src/platform` into the new repository while preserving their public include roots under `include/mce/...`.",
+        "Adopt the `cstl` repository pattern: CMake 4.0 project, `$BUILD_ENV` helper modules, CTest/BUILD_TESTING support, module subdirectories, strict warnings/sanitizer options, and a top-level aggregate target.",
+        "Consume `/home/jan/projects/cstl` by pinned CMake reference and use its exported `mce::`/`mcl::` aliases for extracted core dependencies.",
+        "Preserve the platform targets needed by LinuxCNC as `mce::os`, `mce::rt`, `mce::loop`, `mce::wire`, and `mce::ipc`; adding an aggregate `mce::platform-core` or similar convenience target is allowed if it does not replace the per-module aliases.",
+        "Port and run the existing tests for the extracted modules, including IPC server tests, wire/frame tests, loop tests, OS tests, RT tests, and seqlock/shared-memory tests.",
+        "Add a downstream CMake smoke project that consumes the installed or FetchContent-style platform repository plus pinned `cstl` and links a tiny program against the exported platform targets."
+      ],
+      "out": [
+        "Changing LinuxCNC, AXIS, `linuxcnc.stat()`, `linuxcnc.command()`, `linuxcnc.error_channel()`, or NML transport code in this prerequisite instance.",
+        "Remote NML compatibility, legacy clients, `halui`, `linuxcncsh`, `emcrsh`, or any LinuxCNC migration work beyond documenting the handoff contract.",
+        "Extracting `fs`, generic UI `platform`, Wayland, DRM, graphics, input, Vulkan, or backend-selection code in the first platform repository pass.",
+        "Renaming public `mce_*` symbols, changing public header include roots, or redesigning IPC/RT/wire APIs as part of extraction.",
+        "Replacing the existing binary local IPC direction with protobuf or another schema-heavy transport."
+      ]
+    },
+    "sections": [
+      {
+        "body": "The initial repository is the platform core needed by the LinuxCNC NML replacement prerequisite. Dependency order should follow the existing platform build shape: `os` and `wire` establish base utilities, `rt` depends on `os` and cstl core modules, `loop` depends on `os` and `rt`, and `ipc` depends on `loop`, `os`, and `wire`. The top-level build should add only these subdirectories unless a later consumer justifies broader extraction.",
+        "title": "Module Boundary"
+      },
+      {
+        "body": "Existing platform module links map naturally to `cstl`: `mce::result`, `mcl::alloc`, `mcl::mem`, `mcl::str`, `mcl::math`, `mcl::intern`, `mcl::container`, and `mcl::io` are already preserved aliases in `cstl`. The extraction should keep platform-facing aliases such as `mce::os`, `mce::rt`, `mce::loop`, `mce::wire`, and `mce::ipc`, while changing provider resolution so those cstl aliases come from the pinned cstl repository rather than from the larger `mce-v2` build.",
+        "title": "Dependency Mapping"
+      },
+      {
+        "body": "This instance stops at the platform prerequisite. The later LinuxCNC NML replacement can then consume a pinned `mce-platform` revision for command/error IPC, wire framing, fd passing, shared-memory setup, and seqlock status snapshots while leaving task-to-motion RTAPI shared memory and legacy client compatibility out of the first pass.",
+        "title": "LinuxCNC Handoff"
+      }
+    ]
+  },
+  "id": "design-nml-replacement-platform-prerequisite",
+  "kind": "design",
+  "schema": "loom.workflow/v1",
+  "status": "active",
+  "title": "Design: nml-replacement-platform-prerequisite"
+}
