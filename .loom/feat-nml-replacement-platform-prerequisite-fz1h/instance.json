@@ -28,6 +28,61 @@
       ],
       "target": "plan",
       "verb_reviewed": "plan"
+    },
+    {
+      "file": "reviews/task-m1-t1.json",
+      "kind": "review",
+      "rounds": [
+        1,
+        2
+      ],
+      "target": "m1:T1",
+      "verb_reviewed": "task"
+    },
+    {
+      "file": "reviews/task-m1-t2.json",
+      "kind": "review",
+      "rounds": [
+        1
+      ],
+      "target": "m1:T2",
+      "verb_reviewed": "task"
+    },
+    {
+      "file": "reviews/task-m1-t3.json",
+      "kind": "review",
+      "rounds": [
+        1
+      ],
+      "target": "m1:T3",
+      "verb_reviewed": "task"
+    },
+    {
+      "file": "reviews/task-m2-t1.json",
+      "kind": "review",
+      "rounds": [
+        1
+      ],
+      "target": "m2:T1",
+      "verb_reviewed": "task"
+    },
+    {
+      "file": "reviews/task-m2-t2.json",
+      "kind": "review",
+      "rounds": [
+        1
+      ],
+      "target": "m2:T2",
+      "verb_reviewed": "task"
+    },
+    {
+      "file": "reviews/task-m2-t3.json",
+      "kind": "review",
+      "rounds": [
+        1
+      ],
+      "target": "m2:T3",
+      "verb_reviewed": "task"
     }
   ],
   "created": "2026-06-11T12:59:51.529136Z",

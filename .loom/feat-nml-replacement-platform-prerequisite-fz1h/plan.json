@@ -26,6 +26,7 @@
               ]
             },
             "id": "m1:T1",
+            "note": "build gate passed: sourced /home/jan/projects/build-env/devenv.sh, configured /home/jan/projects/mce-platform with CMake/Ninja and BUILD_TESTING=OFF, and built successfully (`ninja: no work to do`).",
             "reads": [
               "docs/nml-replacement-plan.md",
               ".loom/feat-nml-replacement-platform-prerequisite-fz1h/design.md",
@@ -34,7 +35,7 @@
               "/home/jan/projects/mce-v2/src/platform/AGENTS.md",
               "/home/jan/projects/mce-v2/src/platform/CMakeLists.txt"
             ],
-            "status": "todo",
+            "status": "done",
             "title": "Scaffold `/home/jan/projects/mce-platform` with cstl-style CMake"
           },
           {
@@ -57,6 +58,7 @@
               ]
             },
             "id": "m1:T2",
+            "note": "integration gate passed: copied os, rt, loop, wire, and ipc from /home/jan/projects/mce-v2/src/platform; per-module file inventories diff cleanly against the source modules; excluded fs/platform/wayland/drm directories are absent.",
             "reads": [
               "/home/jan/projects/mce-v2/src/platform/os",
               "/home/jan/projects/mce-v2/src/platform/rt",
@@ -66,7 +68,7 @@
               "/home/jan/projects/mce-v2/src/platform/CMakeLists.txt",
               "/home/jan/projects/mce-v2/src/platform/AGENTS.md"
             ],
-            "status": "todo",
+            "status": "done",
             "title": "Extract the five prerequisite modules into the new repository"
           },
           {
@@ -91,6 +93,7 @@
               ]
             },
             "id": "m1:T3",
+            "note": "build gate passed: clean CMake/Ninja configure and build with BUILD_TESTING=OFF and ENABLE_WARNINGS=ON built cstl plus mce-platform os/wire/rt/loop/ipc targets; forbidden-reference grep over top-level and module CMake files found no mce-v2 source-platform references.",
             "reads": [
               "/home/jan/projects/mce-platform/CMakeLists.txt",
               "/home/jan/projects/mce-platform/os/CMakeLists.txt",
@@ -106,7 +109,7 @@
               "/home/jan/projects/cstl/intern/CMakeLists.txt",
               "/home/jan/projects/cstl/io/CMakeLists.txt"
             ],
-            "status": "todo",
+            "status": "done",
             "title": "Rewire module CMake links to pinned cstl and preserved platform aliases"
           }
         ],
@@ -141,6 +144,7 @@
               ]
             },
             "id": "m2:T1",
+            "note": "unit gate passed: clean CMake/Ninja build with BUILD_TESTING=ON, ctest -N confirmed OS, loop, wire/frame, IPC server, seqlock, and shmem tests, and CTest passed 28/28 platform tests after suppressing dependency cstl tests.",
             "reads": [
               "/home/jan/projects/mce-platform/os/test",
               "/home/jan/projects/mce-platform/rt/test",
@@ -154,7 +158,7 @@
               "/home/jan/projects/mce-v2/src/platform/ipc/test",
               "/home/jan/projects/mce-v2/src/platform/AGENTS.md"
             ],
-            "status": "todo",
+            "status": "done",
             "title": "Port extracted module tests and make the standalone test suite pass"
           },
           {
@@ -176,6 +180,7 @@
               ]
             },
             "id": "m2:T2",
+            "note": "integration gate passed: downstream smoke project configured from /home/jan/projects/mce-platform/test/downstream-smoke into /tmp/mce-platform-smoke-build with MCE_PLATFORM_SOURCE_DIR and CSTL_SOURCE_DIR, built outside the source tree, included IPC/wire/RT/seqlock/OS headers, and linked mce::ipc/mce::wire/mce::rt/mce::os.",
             "reads": [
               "/home/jan/projects/mce-platform/CMakeLists.txt",
               "/home/jan/projects/mce-platform/README.md",
@@ -183,7 +188,7 @@
               "/home/jan/projects/cstl/CMakeLists.txt",
               ".loom/feat-nml-replacement-platform-prerequisite-fz1h/design.md"
             ],
-            "status": "todo",
+            "status": "done",
             "title": "Add downstream CMake smoke consumption for cstl plus mce-platform"
           },
           {
@@ -207,13 +212,14 @@
               ]
             },
             "id": "m2:T3",
+            "note": "integration gate passed against final handoff commit 01d64a0042d9bdfb89b033939b0ed9074ee99b24; tag linuxcnc-nml-prereq-2026-06-11 resolves to that commit; handoff docs mention cstl, LinuxCNC, seqlock, and map IPC/wire/fd-passing/RT shared-memory capabilities to the later LinuxCNC NML replacement.",
             "reads": [
               "docs/nml-replacement-plan.md",
               ".loom/feat-nml-replacement-platform-prerequisite-fz1h/design.md",
               "/home/jan/projects/mce-platform/README.md",
               "/home/jan/projects/mce-platform/CMakeLists.txt"
             ],
-            "status": "todo",
+            "status": "done",
             "title": "Record the pinned platform revision and LinuxCNC handoff"
           }
         ],

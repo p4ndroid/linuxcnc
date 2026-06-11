@@ -18,7 +18,7 @@
 
 ### m1 — Standalone Platform Repository
 
-- **m1:T1** [#488] (todo) — Scaffold `/home/jan/projects/mce-platform` with cstl-style CMake
+- **m1:T1** [#488] (done) — Scaffold `/home/jan/projects/mce-platform` with cstl-style CMake
   - reads: `docs/nml-replacement-plan.md`
   - reads: `.loom/feat-nml-replacement-platform-prerequisite-fz1h/design.md`
   - reads: `/home/jan/projects/cstl/CMakeLists.txt`
@@ -32,7 +32,8 @@
   - Gate: kind=build; command=`bash -lc 'source /home/jan/projects/build-env/devenv.sh && export CC="$BUILD_ENV/bin/gcc" CXX="$BUILD_ENV/bin/g++" && cmake -S /home/jan/projects/mce-platform -B /home/jan/projects/mce-platform/build -G Ninja -DBUILD_TESTING=OFF && cmake --build /home/jan/projects/mce-platform/build'`
     - test: `standalone configure`
     - test: `standalone build with BUILD_TESTING=OFF`
-- **m1:T2** [#489] (todo) — Extract the five prerequisite modules into the new repository
+  - note: build gate passed: sourced /home/jan/projects/build-env/devenv.sh, configured /home/jan/projects/mce-platform with CMake/Ninja and BUILD_TESTING=OFF, and built successfully (`ninja: no work to do`).
+- **m1:T2** [#489] (done) — Extract the five prerequisite modules into the new repository
   - reads: `/home/jan/projects/mce-v2/src/platform/os`
   - reads: `/home/jan/projects/mce-v2/src/platform/rt`
   - reads: `/home/jan/projects/mce-v2/src/platform/loop`
@@ -49,7 +50,8 @@
   - Gate: kind=integration; command=`bash -lc 'for d in os rt loop wire ipc; do test -d "/home/jan/projects/mce-platform/$d" && (cd "/home/jan/projects/mce-v2/src/platform/$d" && find . -type f | sort) > "/tmp/mce-platform-src-$d.files" && (cd "/home/jan/projects/mce-platform/$d" && find . -type f | sort) > "/tmp/mce-platform-dst-$d.files" && diff -u "/tmp/mce-platform-src-$d.files" "/tmp/mce-platform-dst-$d.files"; done && test ! -e /home/jan/projects/mce-platform/fs && test ! -e /home/jan/projects/mce-platform/platform && test ! -e /home/jan/projects/mce-platform/wayland && test ! -e /home/jan/projects/mce-platform/drm'`
     - test: `full selected-module file inventory matches source modules`
     - test: `excluded-module absence`
-- **m1:T3** [#490] (todo) — Rewire module CMake links to pinned cstl and preserved platform aliases
+  - note: integration gate passed: copied os, rt, loop, wire, and ipc from /home/jan/projects/mce-v2/src/platform; per-module file inventories diff cleanly against the source modules; excluded fs/platform/wayland/drm directories are absent.
+- **m1:T3** [#490] (done) — Rewire module CMake links to pinned cstl and preserved platform aliases
   - reads: `/home/jan/projects/mce-platform/CMakeLists.txt`
   - reads: `/home/jan/projects/mce-platform/os/CMakeLists.txt`
   - reads: `/home/jan/projects/mce-platform/rt/CMakeLists.txt`
@@ -74,10 +76,11 @@
     - test: `clean standalone build`
     - test: `cstl-backed target resolution`
     - test: `no extracted CMake references to mce-v2 source platform`
+  - note: build gate passed: clean CMake/Ninja configure and build with BUILD_TESTING=OFF and ENABLE_WARNINGS=ON built cstl plus mce-platform os/wire/rt/loop/ipc targets; forbidden-reference grep over top-level and module CMake files found no mce-v2 source-platform references.
 
 ### m2 — Verification And Downstream Consumption
 
-- **m2:T1** [#491] (todo) — Port extracted module tests and make the standalone test suite pass
+- **m2:T1** [#491] (done) — Port extracted module tests and make the standalone test suite pass
   - reads: `/home/jan/projects/mce-platform/os/test`
   - reads: `/home/jan/projects/mce-platform/rt/test`
   - reads: `/home/jan/projects/mce-platform/loop/test`
@@ -104,7 +107,8 @@
     - test: `registered IPC tests`
     - test: `registered seqlock and shared-memory tests`
     - test: `full CTest run`
-- **m2:T2** [#492] (todo) — Add downstream CMake smoke consumption for cstl plus mce-platform
+  - note: unit gate passed: clean CMake/Ninja build with BUILD_TESTING=ON, ctest -N confirmed OS, loop, wire/frame, IPC server, seqlock, and shmem tests, and CTest passed 28/28 platform tests after suppressing dependency cstl tests.
+- **m2:T2** [#492] (done) — Add downstream CMake smoke consumption for cstl plus mce-platform
   - reads: `/home/jan/projects/mce-platform/CMakeLists.txt`
   - reads: `/home/jan/projects/mce-platform/README.md`
   - reads: `/home/jan/projects/cstl/README.md`
@@ -118,7 +122,8 @@
   - Gate: kind=integration; command=`bash -lc 'source /home/jan/projects/build-env/devenv.sh && export CC="$BUILD_ENV/bin/gcc" CXX="$BUILD_ENV/bin/g++" && rm -rf /tmp/mce-platform-smoke-build && cmake -S /home/jan/projects/mce-platform/test/downstream-smoke -B /tmp/mce-platform-smoke-build -G Ninja -DMCE_PLATFORM_SOURCE_DIR=/home/jan/projects/mce-platform -DCSTL_SOURCE_DIR=/home/jan/projects/cstl && cmake --build /tmp/mce-platform-smoke-build'`
     - test: `downstream configure outside source tree`
     - test: `downstream build links exported platform targets`
-- **m2:T3** [#493] (todo) — Record the pinned platform revision and LinuxCNC handoff
+  - note: integration gate passed: downstream smoke project configured from /home/jan/projects/mce-platform/test/downstream-smoke into /tmp/mce-platform-smoke-build with MCE_PLATFORM_SOURCE_DIR and CSTL_SOURCE_DIR, built outside the source tree, included IPC/wire/RT/seqlock/OS headers, and linked mce::ipc/mce::wire/mce::rt/mce::os.
+- **m2:T3** [#493] (done) — Record the pinned platform revision and LinuxCNC handoff
   - reads: `docs/nml-replacement-plan.md`
   - reads: `.loom/feat-nml-replacement-platform-prerequisite-fz1h/design.md`
   - reads: `/home/jan/projects/mce-platform/README.md`
@@ -133,6 +138,7 @@
     - test: `handoff mentions cstl`
     - test: `handoff mentions LinuxCNC`
     - test: `handoff mentions seqlock status capability`
+  - note: integration gate passed against final handoff commit 01d64a0042d9bdfb89b033939b0ed9074ee99b24; tag linuxcnc-nml-prereq-2026-06-11 resolves to that commit; handoff docs mention cstl, LinuxCNC, seqlock, and map IPC/wire/fd-passing/RT shared-memory capabilities to the later LinuxCNC NML replacement.
 
 
 ## Deferred

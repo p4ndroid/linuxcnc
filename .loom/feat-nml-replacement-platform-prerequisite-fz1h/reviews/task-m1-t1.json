@@ -1,0 +1,49 @@
+{
+  "rounds": [
+    {
+      "body": {
+        "findings": [
+          {
+            "id": "F1",
+            "impact": "The task acceptance allows a pinned local override, and the overall plan depends on a known cstl revision. Without a revision check, later extraction and downstream smoke tasks can silently build against a different cstl API than the one planned, weakening the reproducibility LinuxCNC needs before pinning the platform dependency.",
+            "location": "/home/jan/projects/mce-platform/CMakeLists.txt:27",
+            "problem": "`MCE_PLATFORM_CSTL_SOURCE_DIR` defaults to `/home/jan/projects/cstl` and the README says cstl is pinned, but the scaffold does not verify or record the expected cstl revision at configure time. Any checkout at that path satisfies the gate.",
+            "required_fix": "Add a CMake-time check for the expected cstl git revision or equivalent explicit pin metadata, and document the expected revision in the README so the local override is actually pinned.",
+            "resolution": "Added CMake-time verification that the local cstl checkout is exactly 1c1e9dac9638e574fccc2ff5706b4f27eb381850, documented the pin in README.md, reran the m1:T1 build gate successfully, and committed the fix as af5808c.",
+            "severity": "major",
+            "status": "fixed"
+          }
+        ],
+        "target": "m1:T1",
+        "verb_reviewed": "task"
+      },
+      "id": "review-task-nml-replacement-platform-prerequisite-1",
+      "kind": "review",
+      "links": {
+        "target": "m1:T1"
+      },
+      "round_n": 1,
+      "schema": "loom.workflow/v1",
+      "status": "active",
+      "title": "Review (round 1) of m1:T1 [task] for feat-nml-replacement-platform-prerequisite-fz1h"
+    },
+    {
+      "body": {
+        "findings": [],
+        "target": "m1:T1",
+        "verb_reviewed": "task"
+      },
+      "id": "review-task-nml-replacement-platform-prerequisite-2",
+      "kind": "review",
+      "links": {
+        "target": "m1:T1"
+      },
+      "round_n": 2,
+      "schema": "loom.workflow/v1",
+      "status": "active",
+      "title": "Review (round 2) of m1:T1 [task] for feat-nml-replacement-platform-prerequisite-fz1h"
+    }
+  ],
+  "target": "m1:T1",
+  "verb_reviewed": "task"
+}
