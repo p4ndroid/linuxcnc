@@ -5,8 +5,8 @@
 # locates asound.conf). This file only exports; it runs no commands.
 
 # Force software OpenGL (Mesa llvmpipe). CI runners have no GPU and
-# Qt/GL widgets segfault under hardware GL with no display. The Qt-
-# specific knobs cover qtdragon's QtQuick + RHI paths.
+# Qt/GL widgets segfault under hardware GL with no display. The Qt-specific
+# knobs keep the environment safe for any retained graphical tests.
 export LIBGL_ALWAYS_SOFTWARE=1
 export GALLIUM_DRIVER=llvmpipe
 export QT_QUICK_BACKEND=software

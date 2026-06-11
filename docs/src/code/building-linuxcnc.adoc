@@ -115,16 +115,7 @@ Patches to improve portability to new platforms are always welcome.
 === Realtime
 
 LinuxCNC is a machine tool controller, and it requires a realtime platform to do this job.
-This version of LinuxCNC supports the following platforms.
-The first three listed are realtime operating systems:
-
-RTAI::
-  From https://www.rtai.org.
-  A Linux kernel with the RTAI patch is available from the Debian archive at https://linuxcnc.org.
-  See <<cha:getting-linuxcnc,Getting LinuxCNC>> for installation instructions.
-
-Xenomai::
-  From https://xenomai.org. You will have to compile or obtain a Xenomai kernel yourself.
+This reduced tree supports the following platform:
 
 Preempt-RT::
   From https://rt.wiki.kernel.org.
@@ -172,18 +163,9 @@ $ ./configure --help
 The most commonly used arguments are:
 
 `--with-realtime=uspace`::
-  Build for any realtime platform, or for non-realtime.
+  Build for the POSIX uspace realtime platform, or for non-realtime.
   The resulting LinuxCNC executables will run on both a Linux kernel with Preempt-RT patches (providing realtime machine control) and
   on a vanilla (un-patched) Linux kernel (providing G-code simulation but no realtime machine control).
-
-  If development files are installed for Xenomai (typically from package libxenomai-dev) or RTAI (typically from a package with a name starting "rtai-modules"),
-  support for these real-time kernels will also be enabled.
-
-`--with-realtime=/usr/realtime-$VERSION`::
-  Build for the RTAI realtime platform using the older "kernel realtime" model.
-  This requires that you have an RTAI kernel and the RTAI modules installed in `/usr/realtime-$VERSION`.
-  The resulting LinuxCNC executables will only run on the specified RTAI kernel.
-  As of LinuxCNC 2.7, this produces the best realtime performance.
 
 `--enable-build-documentation`::
   Build the documentation, in addition to the executables.
@@ -312,30 +294,6 @@ The regular values for this argument are:
 
 `uspace`::
   Configure the Debian package for Preempt-RT realtime or for non-realtime (these two are compatible).
-
-`noauto`::
-`rtai`::
-`xenomai`::
-  Normally, the lists of RTOSes for uspace realtime to support is detected automatically.
-  However, if you wish, you may specify one or more of these after `uspace` to enable support for these RTOSes.
-  Or, to disable autodetection, specify `noauto`.
-+
-If you want just the traditional RTAI "kernel module" realtime, use `-r` or `$KERNEL_VERSION` instead.
-
-`rtai=<package name>`::
-  If the development package for RTAI, lxrt, does not start with "rtai-modules",
-  or if the first such package listed by apt-cache search is not the desired one,
-  then explicitly specify the package name.
-
-`-r`::
-  Configure the Debian package for the currently running RTAI kernel.
-  You must be running an RTAI kernel on your build machine for this to work!
-
-`$KERNEL_VERSION`::
-  Configure the Debian package for the specified RTAI kernel version (for example "3.4.9-rtai-686-pae").
-  The matching kernel headers Debian package must be installed on your build machine, e.g. "linux-headers-3.4.9-rtai-686-pae".
-  Note that you can _build_ LinuxCNC in this configuration,
-  but if you are not running the matching RTAI kernel you will not be able to _run_ LinuxCNC, including the test suite.
 
 [[Satisfying-Build-Dependencies]]
 ==== Satisfying Build Dependencies
@@ -478,7 +436,6 @@ It does this in order to prevent the operating system from swapping LinuxCNC out
 Normally, locking memory into RAM is frowned upon, and the operating system places a strict limit on how much memory a user is allowed to have locked.
 
 When using the Preempt-RT realtime platform LinuxCNC runs with enough privilege to raise its memory lock limit itself.
-When using the RTAI realtime platform it does not have enough privilege, and the user must raise the memory lock limit.
 
 If LinuxCNC displays the following message on startup, the problem is your system's configured limit on locked memory:
 

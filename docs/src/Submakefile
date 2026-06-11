@@ -142,10 +142,8 @@ DOC_SRCS_EN := \
 	config/integrator-concepts.adoc \
 	config/lathe-config.adoc \
 	config/moveoff.adoc \
-	config/pncconf.adoc \
 	config/python-hal-interface.adoc \
 	config/python-interface.adoc \
-	config/stepconf.adoc \
 	config/stepper-diagnostics.adoc \
 	config/stepper.adoc \
 	config/stepper-quickstart.adoc \
@@ -189,31 +187,11 @@ DOC_SRCS_EN := \
 	getting-started/updating-linuxcnc.adoc \
 	gui/axis.adoc \
 	gui/filter-programs.adoc \
-	gui/gladevcp.adoc \
-	gui/gladevcp-panels.adoc \
-	gui/gladevcp-libraries.adoc \
-	gui/gmoccapy.adoc \
-	gui/gscreen.adoc \
-	gui/qtdragon.adoc \
-	gui/qtvcp.adoc \
-	gui/qtvcp-vcp-panels.adoc \
-	gui/qtvcp-widgets.adoc \
-	gui/qtvcp-libraries.adoc \
-	gui/qtvcp-vismach.adoc \
-	gui/qtvcp-custom-widgets.adoc \
-	gui/qtvcp-code-snippets.adoc \
-	gui/qtvcp-development.adoc \
-	gui/panelui.adoc \
 	gui/halui.adoc \
 	gui/image-to-gcode.adoc \
-	gui/mdro.adoc \
 	gui/ngcgui.adoc \
-	gui/tklinuxcnc.adoc \
 	gui/tooledit.adoc \
-	gui/touchy.adoc \
-	gui/gstat.adoc \
 	gui/vismach.adoc \
-	gui/gui-dev-reference.adoc \
 	hal/basic-hal.adoc \
 	hal/canonical-devices.adoc \
 	hal/comp.adoc \
@@ -225,8 +203,6 @@ DOC_SRCS_EN := \
 	hal/halui-examples.adoc \
 	hal/intro.adoc \
 	hal/parallel-port.adoc \
-	gui/pyvcp.adoc \
-	gui/pyvcp-examples.adoc \
 	hal/rtcomps.adoc \
 	hal/tools.adoc \
 	hal/tutorial.adoc \
@@ -247,7 +223,6 @@ DOC_SRCS_EN := \
 	motion/external-offsets.adoc \
 	motion/switchkins.adoc \
 	tooldatabase/tooldatabase.adoc \
-	plasma/qtplasmac.adoc \
 	plasma/plasma-cnc-primer.adoc \
 	remap/remap.adoc \
 	user/starting-linuxcnc.adoc \
@@ -1164,27 +1139,20 @@ $(foreach L,$(LANGUAGES),$(eval $(call HTML_COPY_RULE,$(L))))
 	done > $@.new && mv $@.new $@
 
 # mb2hal_HOWTO.ini lives in the docs source tree next to mb2hal.adoc, so the
-# English build includes it directly.  Copy it into the per-language build
+# English build includes it directly. Copy it into the per-language build
 # trees so the po4a-translated mb2hal.adoc resolves the include, and beside
-# the rendered HTML for the download link.  (gmoccapy's release_notes.txt is
-# still pulled from the code tree pending its own move.)
-.include-stamp: $(DOC_SRCDIR)/drivers/mb2hal_HOWTO.ini emc/usr_intf/gmoccapy/release_notes.txt
+# the rendered HTML for the download link.
+.include-stamp: $(DOC_SRCDIR)/drivers/mb2hal_HOWTO.ini
 	(set -x; set -e; \
 	mkdir -p $(DOC_OUT_ADOC)/en/drivers/; \
 	cp -f $(DOC_SRCDIR)/drivers/mb2hal_HOWTO.ini $(DOC_OUT_ADOC)/en/drivers/;\
 	mkdir -p $(DOC_OUT_HTML)/en/drivers/; \
 	cp -f $(DOC_SRCDIR)/drivers/mb2hal_HOWTO.ini $(DOC_OUT_HTML)/en/drivers/;\
-	mkdir -p $(DOC_OUT_HTML)/en/gui/; \
-	cp -f emc/usr_intf/gmoccapy/release_notes.txt $(DOC_OUT_HTML)/en/gui/gmoccapy_release_notes.txt;\
 	for lang in $(LANGUAGES); do \
 		mkdir -p $(DOC_OUT_ADOC)/$$lang/drivers/; \
 		mkdir -p $(DOC_OUT_HTML)/$$lang/drivers/; \
 		cp -f $(DOC_SRCDIR)/drivers/mb2hal_HOWTO.ini $(DOC_OUT_ADOC)/$$lang/drivers/ ; \
 		cp -f $(DOC_SRCDIR)/drivers/mb2hal_HOWTO.ini $(DOC_OUT_HTML)/$$lang/drivers/ ; \
-		mkdir -p $(DOC_OUT_ADOC)/$$lang/gui/; \
-		mkdir -p $(DOC_OUT_HTML)/$$lang/gui/; \
-		cp -f emc/usr_intf/gmoccapy/release_notes.txt $(DOC_OUT_ADOC)/$$lang/gui/gmoccapy_release_notes.txt ; \
-		cp -f emc/usr_intf/gmoccapy/release_notes.txt $(DOC_OUT_HTML)/$$lang/gui/gmoccapy_release_notes.txt ; \
 	done) > $@.new && mv $@.new $@
 
 # Copy all images used by translated adoc files into the directories
@@ -1257,8 +1225,7 @@ $$(patsubst %.adoc,$2/%.html,$$(DOC_SRCS_$(call toUC,$1)_SMALL)): $2/%.html: $2/
 		 -o $$@ $$< || (X=$$$$?; rm -f $$@; exit $$$$X)
 endef
 
-# Stage English sources (.adoc, images, code fixtures like
-# gui/panelui_handler.py) into build/adoc/en so English renders from the build
+# Stage English sources (.adoc, images, code fixtures) into build/adoc/en so English renders from the build
 # tree like translations: docs/src stays clean and includes resolve relatively.
 # components_gen.adoc generates straight into build/adoc/en/hal; svgs_made_from_dots
 # runs first.  find|tar avoids an rsync dependency.  The stamp lives in build/ so

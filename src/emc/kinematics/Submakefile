@@ -17,7 +17,7 @@ PYTARGETS += $(DELTAMODULE)
 #ifdef ULAPI
 # userspace test program ../bin/genserkins:
 #   1) has not been maintained
-#   2) does not start up on RTAI
+#   2) has not been validated recently
 ../bin/genserkins: $(call TOOBJS, $(GENSERKINSSRCS)) ../lib/liblinuxcnchal.so ../lib/libposemath.so
 	$(ECHO) emc/Submakefile:Linking $(notdir $@)
 	$(Q)$(CC) $(LDFLAGS) -o $@ $^ -lm

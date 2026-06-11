@@ -28,7 +28,7 @@
 #              enable_balloons
 
 #####################################################################
-# Sourced by tkemc
+# Sourced by Tcl user interface helpers
 # Uses emchelp.tcl for specific widget help messages
 #####################################################################
 
@@ -110,4 +110,3 @@ proc balloon {target message {cx 0} {cy 0} } {
         set Bulle(set) 1
     }
 }
-

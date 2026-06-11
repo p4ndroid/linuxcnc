@@ -30,7 +30,7 @@ net plasmac:x-offset-current    axis.x.eoffset              =>  plasmac.x-offset
 net plasmac:y-offset-current    axis.y.eoffset              =>  plasmac.y-offset-current
 net plasmac:z-offset-current    axis.z.eoffset              =>  plasmac.z-offset-current
 
-# use existing machine-is-on signal from pncconf if it exists
+# use existing machine-is-on signal if it exists
 if {[hal list sig machine-is-on] != {}} {
     net machine-is-on                                       =>  plasmac.machine-is-on
 } else {
@@ -74,7 +74,7 @@ if [info exists ::TRAJ(SPINDLES)] {
 }
 
 # powermax serial communications
-# for qtplasmac
+# for plasma UI integrations
 if [info exists ::QTPLASMAC(PM_PORT)] {loadusr -Wn pmx485 pmx485 [lindex $::QTPLASMAC(PM_PORT) 0]}
 # for plasmac
 if [info exists ::PLASMAC(PM_PORT)] {loadusr -Wn pmx485 plasmac/pmx485.py [lindex $::PLASMAC(PM_PORT) 0]}

@@ -2697,17 +2697,6 @@ class TclCommands(nf.TclCommands):
     def clear_live_plot(*ignored):
         live_plotter.clear()
 
-    def toggle_show_pyvcppanel(*event):
-        # need to toggle variable manually for keyboard shortcut
-        if len(event) > 0:
-            vars.show_pyvcppanel.set(not vars.show_pyvcppanel.get())
-
-        if vars.show_pyvcppanel.get():
-            vcp_frame.grid(row=0, column=4, rowspan=6, sticky="nw", padx=4, pady=4)
-        else:
-            vcp_frame.grid_remove()
-        o.tkRedraw()
-
     # The next three don't have 'manual_ok' because that's done in jog_on /
     # jog_off
     def jog_plus(event=None):
@@ -3071,7 +3060,6 @@ vars = nf.Variables(root_window,
     ("show_machine_speed", BooleanVar),
     ("show_distance_to_go", BooleanVar),
     ("dro_large_font", BooleanVar),
-    ("show_pyvcppanel", BooleanVar),
     ("show_rapids", BooleanVar),
     ("feedrate", IntVar),
     ("rapidrate", IntVar),
@@ -3118,7 +3106,6 @@ vars.show_machine_limits.set(ap.getpref("show_machine_limits", "True"))
 vars.show_machine_speed.set(ap.getpref("show_machine_speed", "True"))
 vars.show_distance_to_go.set(ap.getpref("show_distance_to_go", "False"))
 vars.dro_large_font.set(ap.getpref("dro_large_font", "False"))
-vars.show_pyvcppanel.set("True")
 vars.block_delete.set(ap.getpref("block_delete", "True"))
 vars.optional_stop.set(ap.getpref("optional_stop", "True"))
 
@@ -3772,7 +3759,10 @@ if increments:
 widgets.jogincr.configure(command= jogspeed_listbox_change)
 root_window.call(widgets.jogincr._w, "select", 0)
 
-vcp = inifile.find("DISPLAY", "PYVCP")
+if inifile.find("DISPLAY", "PYVCP"):
+    print("AXIS PyVCP panel support has been removed from this build; ignoring [DISPLAY]PYVCP")
+if inifile.find("DISPLAY", "GLADEVCP"):
+    print("AXIS GladeVCP panel support has been removed from this build; ignoring [DISPLAY]GLADEVCP")
 
 arcdivision = inifile.getint("DISPLAY", "ARCDIVISION", fallback=64)
 
@@ -3967,50 +3957,9 @@ if hal_present == 1 :
 
     vars.has_ladder.set(hal.component_exists('classicladder_rt'))
 
-    if vcp:
-        import vcpparse
-        f = Tkinter.Frame(root_window)
-        if inifile.find("DISPLAY", "PYVCP_POSITION") == "BOTTOM":
-            f.grid(row=4, column=0, columnspan=6, sticky="nw", padx=4, pady=4)
-        else:
-            f.grid(row=0, column=4, rowspan=6, sticky="nw", padx=4, pady=4)
-        vcpparse.filename = vcp
-        vcpcomp = hal.component("pyvcp")
-        vcpparse.create_vcp(f, vcpcomp)
-        vcpcomp.ready()
-        vcp_frame = f
-        root_window.bind("<Control-e>", commands.toggle_show_pyvcppanel)
-        help2 += [("Ctrl-E", _("toggle PYVCP panel visibility"))]
-    else:
-        widgets.menu_view.delete(_("Show PyVCP pan_el").replace("_", ""))
-
-    gladevcp = inifile.find("DISPLAY", "GLADEVCP")
-    if gladevcp:
-        f = Tkinter.Frame(root_window, container=1, borderwidth=0, highlightthickness=0)
-        f.grid(row=0, column=5, rowspan=6, sticky="nsew", padx=4, pady=4)
-    else:
-        f = None
-    gladevcp_frame = f
+    widgets.menu_view.delete(_("Show PyVCP pan_el").replace("_", ""))
 
 _dynamic_childs = {}
-# Call this later
-def load_gladevcp_panel():
-    gladevcp = inifile.find("DISPLAY", "GLADEVCP")
-    if gladevcp:
-        gladecmd = gladevcp.split()
-        if '-c' in gladecmd:
-            gladename = gladecmd[gladecmd.index('-c') + 1]
-            del gladecmd[gladecmd.index('-c') + 1]
-            del gladecmd[gladecmd.index('-c')]
-        else:
-            gladename = 'gladevcp'
-        from subprocess import Popen
-        xid = gladevcp_frame.winfo_id()
-        cmd = "halcmd loadusr -Wn {0} gladevcp -c {0}".format(gladename).split()
-        cmd += ['-d', '-x', str(xid)] + gladecmd
-        print(cmd)
-        child = Popen(cmd)
-        _dynamic_childs['{}'.format(gladename)] = (child, cmd, True)
 
 notifications = Notification(root_window)
 
@@ -4076,44 +4025,11 @@ def _dynamic_tab(name, text):
     return tab
 
 def _dynamic_tabs(inifile):
-    from subprocess import Popen
     tab_names = inifile.findall("DISPLAY", "EMBED_TAB_NAME")
     tab_cmd   = inifile.findall("DISPLAY", "EMBED_TAB_COMMAND")
-    if len(tab_names) != len(tab_cmd):
-        print("Invalid tab configuration")
-        # Complain somehow
+    if tab_names or tab_cmd:
+        print("AXIS embedded tab support has been removed from this build; ignoring EMBED_TAB_* settings")
         return
-
-    # XXX: Set our root window ID in environment so child GladeVcp processes
-    # may forward keyboard events to it
-    rxid = root_window.winfo_id()
-    os.environ['AXIS_FORWARD_EVENTS_TO'] = str(rxid)
-    for i,t,c in zip(list(range(len(tab_cmd))), tab_names, tab_cmd):
-        w = _dynamic_tab("user_" + str(i), t)
-        if c.split()[0] == 'pyvcp': # this is a pycvp panel
-            import vcpparse
-            f = Tkinter.Frame(w, borderwidth=0, highlightthickness=0)
-            pyvcp = c.split()
-            if len(pyvcp) != 2:
-                print("Invalid PyVCP tab configuration: EMBED_TAB COMMAND =", c)
-                print("Incorrect number of parameters")
-                continue
-            try:
-                f.pack(fill="y", expand=0)
-                vcpparse.filename = pyvcp[1]
-                vcpparse.create_vcp(f, comp=None, compname=t.lower().replace(' ','_'))
-            except Exception as e:
-                print("Invalid PyVCP tab configuration: EMBED_TAB COMMAND =", c)
-                print(e)
-        else: # this is a gladevcp panel
-            f = Tkinter.Frame(w, container=1, borderwidth=0, highlightthickness=0)
-            f.pack(fill="both", expand=1)
-            xid = f.winfo_id()
-            cmd = c.replace('{XID}', str(xid)).split()
-            child = Popen(cmd)
-            wait = cmd[:2] == ['halcmd', 'loadusr']
-
-            _dynamic_childs[str(w)] = (child, cmd, wait)
 
 @atexit.register
 def kill_dynamic_childs():
@@ -4288,7 +4204,6 @@ if hal_present == 1 :
 
 _dynamic_tabs(inifile)
 if hal_present == 1:
-    load_gladevcp_panel()
     check_dynamic_tabs()
 else:
     root_window.deiconify()

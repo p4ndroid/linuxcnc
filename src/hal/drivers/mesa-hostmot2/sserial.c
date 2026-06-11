@@ -29,9 +29,7 @@
 #include "hostmot2.h"
 #include "bitfile.h"
 
-// Local definition of labs() because RTAI compile barfs on using labs(). It
-// could be optimized using compiler built-ins, but the single use in here is
-// not critical.
+// Local 64-bit absolute value helper. The single use in here is not critical.
 static inline rtapi_s64 xlabs(rtapi_s64 x) { return x < 0 ? -x : x; }
 
 int getbits(hm2_sserial_remote_t *chan, rtapi_u64 *val, int start, int len){

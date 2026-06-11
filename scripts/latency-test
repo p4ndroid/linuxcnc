@@ -81,93 +81,135 @@ if [ "$BASE" -eq "$SERVO" ]; then BASE=0; fi
 BASE_HUMAN=$(human_time "$BASE")
 SERVO_HUMAN=$(human_time "$SERVO")
 
-if [ "$BASE" -eq 0 ]; then
-cat > lat.hal <<EOF
-loadrt threads name1=slow period1=$SERVO
-loadrt timedelta count=1
-addf timedelta.0 slow
-start
-loadusr -Wn lat pyvcp lat.xml
-net sl timedelta.0.max => lat.sl
-net sj timedelta.0.jitter => lat.sj
-net st timedelta.0.out => lat.st
-net reset lat.reset => timedelta.0.reset
-waitusr lat
-loadusr -w bash latexit.sh
-EOF
-else
-cat > lat.hal <<EOF
-loadrt threads name1=fast period1=$BASE name2=slow period2=$SERVO
+if [ "$BASE" -ne 0 ]; then
+    BASE_HAL='
+loadrt threads name1=fast period1='"$BASE"' name2=slow period2='"$SERVO"'
 loadrt timedelta count=2
 addf timedelta.0 fast
 addf timedelta.1 slow
-start
-loadusr -Wn lat pyvcp lat.xml
-net sl timedelta.1.max => lat.sl
-net sj timedelta.1.jitter => lat.sj
-net st timedelta.1.out => lat.st
-net bl timedelta.0.max => lat.bl
-net bj timedelta.0.jitter => lat.bj
-net bt timedelta.0.out => lat.bt
-net reset lat.reset => timedelta.0.reset timedelta.1.reset
-waitusr lat
-loadusr -w bash latexit.sh
-EOF
+net sl timedelta.1.max
+net sj timedelta.1.jitter
+net st timedelta.1.out
+net bl timedelta.0.max
+net bj timedelta.0.jitter
+net bt timedelta.0.out
+newsig reset bit
+linksp reset timedelta.0.reset
+linksp reset timedelta.1.reset'
+else
+    BASE_HAL='
+loadrt threads name1=slow period1='"$SERVO"'
+loadrt timedelta count=1
+addf timedelta.0 slow
+net sl timedelta.0.max
+net sj timedelta.0.jitter
+net st timedelta.0.out
+newsig reset bit
+linksp reset timedelta.0.reset'
 fi
 
-cat > lat.xml <<EOF
-<pyvcp>
-<title title="LinuxCNC / HAL Latency Test"/>
-<axisoptions/>
-<table>
+cat > lat-ui.tcl <<EOF
+#!/usr/bin/env wish
+wm title . "LinuxCNC / HAL Latency Test"
 
-<tablerow/><tablespan columns="5"/><label wraplength="5i" justify="left">
-<text>
-"""
-$machine on host $node $date
+array set vals {
+    sl - sj - st - bl - bj - bt -
+}
+
+proc hal_get {name} {
+    if {[catch {exec halcmd gets \$name} value]} {
+        return "-"
+    }
+    return [string trim \$value]
+}
+
+proc reset_stats {} {
+    catch {exec halcmd sets reset TRUE}
+    after 100 {catch {exec halcmd sets reset FALSE}}
+}
+
+proc update_values {} {
+    global vals has_base
+    foreach name {sl sj st} {
+        set vals(\$name) [hal_get \$name]
+    }
+    if {\$has_base} {
+        foreach name {bl bj bt} {
+            set vals(\$name) [hal_get \$name]
+        }
+    }
+    after 500 update_values
+}
+
+proc finish {} {
+    global vals has_base env
+    set candidates [list \$vals(sj)]
+    if {\$has_base} {
+        lappend candidates \$vals(bj)
+    }
+    set latency_file [file join \$env(HOME) .latency]
+    if {[file exists \$latency_file]} {
+        if {![catch {open \$latency_file r} fh]} {
+            lappend candidates [string trim [read \$fh]]
+            close \$fh
+        }
+    }
+    set max 0
+    foreach value \$candidates {
+        if {[string is integer -strict \$value] && \$value > \$max} {
+            set max \$value
+        }
+    }
+    if {![catch {open \$latency_file w} fh]} {
+        puts \$fh \$max
+        close \$fh
+    }
+    destroy .
+}
+
+set has_base $([ "$BASE" -ne 0 ] && echo 1 || echo 0)
+
+message .intro -width 520 -justify left -text {$machine on host $node $date
 Kernel-release=$krelease
 Kernel-version=$kversion
 
 Let this test run for a few minutes, then note the maximum Jitter. You will use it while configuring LinuxCNC.
 
-While the test is running, you should "abuse" the computer. Move windows around on the screen. Surf the web. Copy some large files around on the disk. Play some music. Run an OpenGL program such as glxgears. The idea is to put the PC through its paces while the latency test checks to see what the worst case numbers are."""
-</text>
-</label>
+While the test is running, you should "abuse" the computer. Move windows around on the screen. Surf the web. Copy some large files around on the disk. Play some music. Run an OpenGL program such as glxgears. The idea is to put the PC through its paces while the latency test checks to see what the worst case numbers are.}
+grid .intro -column 0 -row 0 -columnspan 4 -sticky ew -padx 8 -pady 8
 
-<tablerow/>
-<label/>
-  <label text="Max Interval (ns)" font="Helvetica 12"/>
-  <label text="Max Jitter (ns)" font="Helvetica 12 bold"/>
-  <label text="Last interval (ns)" font="Helvetica 12"/>
+label .blank -text ""
+label .maxint -text "Max Interval (ns)"
+label .maxjit -text "Max Jitter (ns)" -font "Helvetica 12 bold"
+label .last -text "Last interval (ns)"
+grid .blank .maxint .maxjit .last -padx 6 -pady 2
 
-<tablerow/><label text="Servo thread ($SERVO_HUMAN):"/><s32 halpin="sl"/><s32 halpin="sj" font="Helvetica 12 bold"/><s32 halpin="st"/>
+label .servo -text "Servo thread ($SERVO_HUMAN):"
+label .sl -textvariable vals(sl)
+label .sj -textvariable vals(sj) -font "Helvetica 12 bold"
+label .st -textvariable vals(st)
+grid .servo .sl .sj .st -sticky ew -padx 6 -pady 2
+
+if {\$has_base} {
+    label .base -text "Base thread ($BASE_HUMAN):"
+    label .bl -textvariable vals(bl)
+    label .bj -textvariable vals(bj) -font "Helvetica 12 bold"
+    label .bt -textvariable vals(bt)
+    grid .base .bl .bj .bt -sticky ew -padx 6 -pady 2
+}
+
+button .reset -text "Reset Statistics" -command reset_stats
+grid .reset -column 0 -row 4 -columnspan 4 -pady 8
+
+wm protocol . WM_DELETE_WINDOW finish
+update_values
 EOF
+chmod +x lat-ui.tcl
 
-if [ "$BASE" -ne 0 ]; then
-cat >> lat.xml <<EOF
-<tablerow/><label text="Base thread ($BASE_HUMAN):"/><s32 halpin="bl"/><s32 halpin="bj" font="Helvetica 12 bold"/><s32 halpin="bt"/>
-EOF
-fi
-
-cat >> lat.xml <<EOF
-<tablerow/>
-  <button text="Reset Statistics" halpin="reset" />
-
-</table>
-</pyvcp>
-EOF
-
-if [ "$BASE" -eq 0 ]; then
-    SIGNALS="halcmd gets sj"
-else
-    SIGNALS="halcmd gets sj; halcmd gets bj"
-fi
-
-cat > latexit.sh <<EOF
-L=\$(($SIGNALS
-    if [ -f "$HOME"/.latency ]; then cat "$HOME"/.latency; fi
-    ) | sort -n | tail -1)
-echo \$L > "$HOME"/.latency
+cat > lat.hal <<EOF
+$BASE_HAL
+start
+loadusr -w ./lat-ui.tcl
 EOF
 
 halrun lat.hal

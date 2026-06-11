@@ -9,7 +9,7 @@
 # (stat.position_after - stat.position_after_home) equals --expect-delta-mm
 # converted to machine units via stat.linear_units. Snapshot-and-delta
 # sidesteps per-sim HOME offsets; mm-input + linear_units conversion
-# sidesteps per-sim LINEAR_UNITS (axis and touchy sims are inch).
+# sidesteps per-sim LINEAR_UNITS.
 
 import argparse
 import linuxcnc
@@ -24,12 +24,11 @@ POLL_INTERVAL_S = 0.01
 # Per-attempt wait timeout for ensure_state / ensure_mode. The state
 # normally lands well under 1s; profiling showed nothing benefits from
 # more than 3s here, and shorter timeouts trim wall time when a retry
-# is needed (notably gmoccapy reverting task_mode AUTO -> MANUAL).
+# is needed.
 ENSURE_ATTEMPT_TIMEOUT_S = 3.0
 # After the desired task_state / task_mode is reached, re-check after
-# this long. Some GUIs (notably gmoccapy and qtdragon) run their own
-# startup commands that can revert a state we just set; the post-reach
-# stability check catches that.
+# this long. A GUI can run its own startup commands that revert a state
+# we just set; the post-reach stability check catches that.
 STATE_STABILITY_S = 0.5
 STATE_RETRY_BUDGET = 6
 
@@ -55,7 +54,7 @@ def _read_pid(path):
 
 # Crash markers faulthandler and scripts/linuxcnc write to linuxcnc.err
 # the instant the GUI dies. The launcher PID can linger in Cleanup, so
-# scanning these catches the crash sooner and regardless of which GUI.
+# scanning these catches the crash sooner.
 _CRASH_MARKERS = ("Fatal Python error", "Segmentation fault", "Aborted")
 
 
@@ -144,7 +143,7 @@ def home_all(cmd, stat, timeout):
     via ensure_state; otherwise the home command is rejected with
     'cannot be executed until the machine is out of E-stop and turned
     on'. Mode change uses ensure_mode so a GUI that reverts mode mid-
-    sequence (gmoccapy) is detected and retried."""
+    sequence is detected and retried."""
     if not ensure_mode(cmd, stat, linuxcnc.MODE_MANUAL, "MODE_MANUAL"):
         return False
     cmd.teleop_enable(0)
@@ -176,8 +175,8 @@ def wait_state(stat, target_state, timeout, label):
 def ensure_state(cmd, stat, target_state, label):
     """Issue c.state(target_state), wait for stat.task_state to reach
     target_state, then verify it stays there across STATE_STABILITY_S.
-    If the GUI reverts (e.g. gmoccapy re-issues its own ESTOP on
-    startup), retry up to STATE_RETRY_BUDGET times. Returns True on
+    If the GUI reverts state during startup, retry up to
+    STATE_RETRY_BUDGET times. Returns True on
     stable success, False on exhausted budget."""
     for attempt in range(1, STATE_RETRY_BUDGET + 1):
         cmd.state(target_state)

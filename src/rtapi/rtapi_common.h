@@ -1,8 +1,8 @@
 #ifndef __LINUXCNC_RTAPI_COMMON_H
 #define __LINUXCNC_RTAPI_COMMON_H
 
-/** RTAPI is a library providing a uniform API for several real time
-  operating systems.  As of ver 2.0, RTLinux and RTAI are supported.
+/** RTAPI is a library providing a uniform API for LinuxCNC realtime and
+  non-realtime code. This reduced tree supports the POSIX uspace backend.
 */
 /********************************************************************
 * Description:  rtapi_common.h
@@ -20,9 +20,7 @@
 
 /** This file, 'rtapi_common.h', contains typedefs and other items
     common to both the realtime and non-realtime portions of the
-    implementation.  These items are also common to both the RTAI
-    and RTLinux implementations, and most likely to any other
-    implementations in the Linux environment.  This data is INTERNAL
+    implementation. This data is INTERNAL
     to the RTAPI implementation, and should not be included in any
     application modules.
 */

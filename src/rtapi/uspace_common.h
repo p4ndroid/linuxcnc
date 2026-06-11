@@ -357,54 +357,6 @@ static inline int detect_preempt_rt() {
 }
 #endif
 
-// FIXME: detect_rtai/detect_xenomai/detect_xenomai_evl currently gate on
-// setuid because the RTAI/Xenomai backends still need root for iopl()
-// (RTAI) or RTDM device access (Xenomai/EVL).  Long-term these should
-// probe the actual capability the way can_set_sched_fifo() does, paired
-// with udev rules + a 'xenomai'/'evl' group; @hdiethelm has a follow-up
-// planned.  Until then, an unprivileged user on a Xenomai kernel cannot
-// claim the Xenomai backend, and falls back to the SCHED_FIFO probe.
-static inline int has_setuid_root() {
-    return geteuid() == 0;
-}
-
-#ifdef USPACE_RTAI
-static int detect_rtai() {
-    if(!has_setuid_root()) return 0;
-    struct utsname u;
-    uname(&u);
-    return strcasestr (u.release, "-rtai") != 0;
-}
-#else
-static int detect_rtai() {
-    return 0;
-}
-#endif
-#ifdef USPACE_XENOMAI
-static int detect_xenomai() {
-    if(!has_setuid_root()) return 0;
-    struct stat sb;
-    //Running xenomai has /proc/xenomai
-    return stat("/proc/xenomai", &sb) == 0;
-}
-#else
-static int detect_xenomai() {
-    return 0;
-}
-#endif
-#ifdef USPACE_XENOMAI_EVL
-static int detect_xenomai_evl() {
-    if(!has_setuid_root()) return 0;
-    struct stat sb;
-    //Running xenomai evl has /dev/evl but no /proc/xenomai
-    return stat("/dev/evl", &sb) == 0;
-}
-#else
-static int detect_xenomai_evl() {
-    return 0;
-}
-#endif
-
 // errno from the most recent sched_setscheduler(SCHED_FIFO) probe.  Zero
 // when the probe succeeded or has not run yet.  Read via
 // rtapi_sched_fifo_errno() from diagnostic code.
@@ -445,9 +397,8 @@ static int can_set_sched_fifo(void) {
 static inline int rtapi_sched_fifo_errno(void) { return rtapi_sched_fifo_last_errno; }
 
 // rtapi_is_realtime() reports whether this process can actually run
-// realtime code.  This matches the convention used by JACK, PipeWire,
-// rtkit, Xenomai, and Klipper: surface the observed capability, not
-// kernel metadata.  The old setuid-root stat check has been removed; it
+// realtime code. Surface the observed POSIX SCHED_FIFO capability, not
+// kernel metadata. The old setuid-root stat check has been removed; it
 // stat()ed EMC2_BIN_DIR/rtapi_app rather than the running binary (breaking
 // wrapper-based installs like NixOS /run/wrappers) and silently masked
 // LINUXCNC_FORCE_REALTIME (see issue #3928).
@@ -457,9 +408,6 @@ int rtapi_is_realtime() {
 
     const char *force = getenv("LINUXCNC_FORCE_REALTIME");
     if(force != NULL && atoi(force) != 0)
-        return (cached = 1);
-
-    if(detect_rtai() || detect_xenomai() || detect_xenomai_evl())
         return (cached = 1);
 
     return (cached = can_set_sched_fifo());

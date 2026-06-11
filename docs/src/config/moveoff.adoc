@@ -85,7 +85,7 @@ Sim configurations that demonstrate the component and a
 GUI (moveoff_gui) are located in:
 
 * configs/sim/axis/moveoff  (axis-ui)
-* configs/sim/touchy/ngcgui (touchy-ui)
+* configs/sim/axis/ngcgui
 
 == Modifying an existing configuration
 

@@ -1293,7 +1293,7 @@ class GlCanonDraw:
 
     def show_icon(self,idx,icon):
         # only show icon once for idx for home,limit icons
-        #   accommodates hal_gremlin override format_dro()
+        #   accommodates preview overrides of format_dro()
         #   and prevents display for both Rad and Dia
         if icon is homeicon:
             if idx in self.show_icon_home_list: return

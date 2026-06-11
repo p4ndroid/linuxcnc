@@ -48,15 +48,6 @@ include::plasma/plasma-cnc-primer.adoc[]
 
 
 :leveloffset: 1
-= Configuration Wizards
-
-:leveloffset: 2
-include::config/stepconf.adoc[]
-
-include::config/pncconf.adoc[]
-
-
-:leveloffset: 1
 = Configuration
 
 :leveloffset: 2
@@ -215,21 +206,7 @@ include::tooldatabase/tooldatabase.adoc[]
 :leveloffset: 2
 include::gui/axis.adoc[]
 
-include::gui/gmoccapy.adoc[]
-
-include::gui/touchy.adoc[]
-
-include::gui/gscreen.adoc[]
-
-include::gui/qtdragon.adoc[]
-
 include::gui/ngcgui.adoc[]
-
-include::gui/tklinuxcnc.adoc[]
-
-include::plasma/qtplasmac.adoc[]
-
-include::gui/mdro.adoc[]
 
 
 :leveloffset: 1
@@ -260,42 +237,9 @@ include::gcode/rs274ngc.adoc[]
 
 
 :leveloffset: 1
-= Virtual Control Panels
-
-:leveloffset: 2
-include::gui/pyvcp.adoc[]
-
-include::gui/pyvcp-examples.adoc[]
-
-include::gui/gladevcp.adoc[]
-
-include::gui/gladevcp-libraries.adoc[]
-
-include::gui/gladevcp-panels.adoc[]
-
-include::gui/qtvcp.adoc[]
-
-include::gui/qtvcp-vcp-panels.adoc[]
-
-include::gui/qtvcp-widgets.adoc[]
-
-include::gui/qtvcp-libraries.adoc[]
-
-include::gui/qtvcp-vismach.adoc[]
-
-include::gui/qtvcp-custom-widgets.adoc[]
-
-include::gui/qtvcp-code-snippets.adoc[]
-
-include::gui/qtvcp-development.adoc[]
-
-
-:leveloffset: 1
 = User Interface Programming
 
 :leveloffset: 2
-include::gui/panelui.adoc[]
-
 include::config/python-interface.adoc[]
 
 include::config/python-hal-interface.adoc[]

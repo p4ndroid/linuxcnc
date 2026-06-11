@@ -3,7 +3,7 @@
 ** License GPL Version 2
 **
 ** Example Usage (for customizing the genser-switchkins module):
-** (works with rtpreempt only rtai --> Makefile needs work)
+** (works with the POSIX uspace realtime backend)
 **
 **        LDIR is LinuxCNC git root directory
 **        UDIR is user directory (not in LinuxCNC git tree)

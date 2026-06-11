@@ -1155,7 +1155,7 @@ int do_loadrt_cmd(char *mod_name, char *args[])
     hal_comp_t *comp;
     const char *argv[MAX_TOK+3];
     char *cp1;
-#if defined(RTAPI_USPACE)
+
     argv[m++] = "-Wn";
     argv[m++] = mod_name;
     argv[m++] = EMC2_BIN_DIR "/rtapi_app";
@@ -1167,62 +1167,10 @@ int do_loadrt_cmd(char *mod_name, char *args[])
     }
     argv[m++] = NULL;
     retval = do_loadusr_cmd(argv);
-#else
-    static const char *rtmod_dir = EMC2_RTLIB_DIR;
-    struct stat stat_buf;
-    char mod_path[MAX_CMD_LEN+1];
-
-    if (hal_get_lock()&HAL_LOCK_LOAD) {
-	halcmd_error("HAL is locked, loading of modules is not permitted\n");
-	return -EPERM;
-    }
-    if ( (strlen(rtmod_dir)+strlen(mod_name)+5) > MAX_CMD_LEN ) {
-	halcmd_error("Module path too long\n");
-	return -1;
-    }
-
-    /* make full module name '<path>/<name>.o' */
-    {
-        int r;
-        r = snprintf(mod_path, sizeof(mod_path), "%s/%s%s", rtmod_dir, mod_name, MODULE_EXT);
-        if (r < 0) {
-            halcmd_error("error making module path for %s/%s%s\n", rtmod_dir, mod_name, MODULE_EXT);
-            return -1;
-        } else if (r >= (int)sizeof(mod_path)) {
-            // truncation!
-            halcmd_error("module path too long (max %lu) for %s/%s%s\n", (unsigned long)sizeof(mod_path)-1, rtmod_dir, mod_name, MODULE_EXT);
-            return -1;
-        }
-    }
-
-    /* is there a file with that name? */
-    if ( stat(mod_path, &stat_buf) != 0 ) {
-        /* can't find it */
-        halcmd_error("Can't find module '%s' in %s\n", mod_name, rtmod_dir);
-        return -1;
-    }
-    
-    argv[0] = EMC2_BIN_DIR "/linuxcnc_module_helper";
-    argv[1] = "insert";
-    argv[2] = mod_path;
-    /* loop thru remaining arguments */
-    n = 0;
-    m = 3;
-    while ( args[n] && args[n][0] != '\0' ) {
-        argv[m++] = args[n++];
-    }
-    /* add a NULL to terminate the argv array */
-    argv[m] = NULL;
-
-    retval = hal_systemv(argv);
-#endif
 
     if ( retval != 0 ) {
-	halcmd_error("insmod for %s failed, returned %d\n"
-#if !defined(RTAPI_USPACE)
-            "See the output of 'dmesg' for more information.\n"
-#endif
-        , mod_name, retval );
+	halcmd_error("rtapi_app load for %s failed, returned %d\n",
+            mod_name, retval);
 	return -1;
     }
     /* make the args that were passed to the module into a single string */
@@ -1395,10 +1343,7 @@ int do_unloadrt_cmd(char *mod_name)
 	return -1;
     }
     /* Unload newest first so dependent modules release their references
-       before the ones they depend on are removed. This matters for
-       kernel modules (RTAI) where rmmod refuses to unload an in-use
-       module. Uspace dlclose has no such check, which is why a wrong
-       direction here only ever surfaces on RTAI.
+       before the ones they depend on are removed.
 
        Iterating forward (i = 0 .. n-1) is "newest first" because the
        array was built by walking comp_list_ptr from its head, and that
@@ -1433,13 +1378,8 @@ static int unloadrt_comp(char *mod_name)
     int retval;
     const char *argv[4];
 
-#if defined(RTAPI_USPACE)
     argv[0] = EMC2_BIN_DIR "/rtapi_app";
     argv[1] = "unload";
-#else
-    argv[0] = EMC2_BIN_DIR "/linuxcnc_module_helper";
-    argv[1] = "remove";
-#endif
     argv[2] = mod_name;
     /* add a NULL to terminate the argv array */
     argv[3] = NULL;
@@ -1447,7 +1387,7 @@ static int unloadrt_comp(char *mod_name)
     retval = hal_systemv(argv);
 
     if ( retval != 0 ) {
-	halcmd_error("rmmod failed, returned %d\n", retval);
+	halcmd_error("rtapi_app unload failed, returned %d\n", retval);
 	return -1;
     }
     /* print success message */

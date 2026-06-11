@@ -5,9 +5,8 @@ TESTDIR=$(dirname "$1")
 cd "${TESTDIR}"
 
 # HAL assigns each component a unique component ID at load-time.
-# The RTAI and uspace HAL implementations assign different component IDs,
-# so remove all mentions of specific component IDs from the result file,
-# so that a single `expected` file works for both.
+# HAL assigns component IDs at load-time, so remove all mentions of specific
+# component IDs from the result file.
 sed --in-place --regexp-extended --expression='s/^(.*unloading HAL module \[)[0-9]+(.*)$/\1(ignored comp id)\2/' result
 
 # The SIGQUIT signal does not arrive at a well-defined time, so don't

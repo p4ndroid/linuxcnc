@@ -612,8 +612,7 @@ pin out float example;
 
 This fragment of a component illustrates the use of the 'hal_' prefix in a component name.
 
-`loop` is a common name, and the `hal_` prefix avoids potential name collisions with other unrelated software.
-For example, on RTAI realtime systems realtime code runs in the kernel, so if the component were named just `loop` it could easily conflict with the standard `loop` kernel module.
+`loop` is a common name, and the `hal_` prefix avoids potential name collisions with other unrelated software and components.
 
 When loaded, 'halcmd show comp' will show a component called 'hal_loop'.
 However, the pin shown by 'halcmd show pin' will be 'loop.0.example', not 'hal-loop.0.example'.

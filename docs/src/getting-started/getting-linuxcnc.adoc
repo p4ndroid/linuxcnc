@@ -10,11 +10,9 @@ There are also <<_alternate_install_methods,Alternate Install Methods>> for the 
 If you have an existing install that you want to upgrade,
 go to the <<cha:updating-linuxcnc,Updating LinuxCNC>> section instead.
 
-NOTE: To operate machinery LinuxCNC requires a special kernel with real-time extensions. There
-are three possibilities here: preempt-rt, RTAI or Xenomai. In addition there are two versions
-of LinuxCNC which work with these kernels. See the table below for details. However for code
-testing and simulation it is possible to run the `linuxcnc-uspace` application on a stock kernel
-of the distribution.
+NOTE: To operate machinery LinuxCNC requires a PREEMPT_RT kernel and the
+uspace runtime. For code testing and simulation it is possible to run the
+`linuxcnc-uspace` application on a stock distribution kernel.
 
 Fresh installs of LinuxCNC are most easily created using the Live/Install
 Image. This is a hybrid ISO filesystem image that can be written to a
@@ -216,10 +214,8 @@ configuration. Some of the sample configurations include onscreen
 To see if your computer is suitable for software step pulse generation
 run the Latency Test as shown <<sec:latency-test,here>>.
 
-At the time of writing the Live Image is only available with the
-preempt-rt kernel and a matching LinuxCNC. On some hardware this might
-not offer good enough latency. There is an experimental version available
-using the RTAI realtime kernel which will often give better latency.
+At the time of writing the Live Image is available with the preempt-rt kernel
+and a matching LinuxCNC.
 
 == Installing LinuxCNC
 
@@ -255,11 +251,9 @@ In addition, for experienced users who are familiar with Debian system administr
 
 [options="header"]
 |===
-| Debian Trixie   | amd64 & arm64 | preempt-rt | linuxcnc-uspace | machine control & simulation
-| Debian Trixie   | amd64         | RTAI       | linuxcnc        | machine control
 | Distribution    | Architecture  | Kernel     | Package name    | Typical use
+| Debian Trixie   | amd64 & arm64 | preempt-rt | linuxcnc-uspace | machine control & simulation
 | Debian Bookworm | amd64 & arm64 | preempt-rt | linuxcnc-uspace | machine control & simulation
-| Debian Bookworm | amd64         | RTAI       | linuxcnc        | machine control
 | Debian Bullseye | amd64         | preempt-rt | linuxcnc-uspace | machine control & simulation
 | Any             | Any           | Stock      | linuxcnc-uspace | simulation ONLY
 |===
@@ -272,19 +266,6 @@ The Preempt-rt kernels are available for Debian from the regular debian.org arch
 The package is called `linux-image-rt-*`.
 Simply install the package in the same way as any other package from the
 Synaptic Package manager or with apt-get at the command-line.
-
-.RTAI Kernels
-
-The RTAI kernels are available for download from the linuxcnc.org debian archive.
-The apt source is:
-
-* Debian Trixie: `deb http://linuxcnc.org trixie base`
-* Debian Bookworm: `deb http://linuxcnc.org bookworm base`
-* Debian Bullseye: `deb http://linuxcnc.org bullseye base`
-* Debian Buster: `deb http://linuxcnc.org buster base`
-
-LinuxCNC and the RTAI kernel are now only available for 64-bit OSes but
-there are very few surviving systems that can not run a 64-bit OS.
 
 === Installing on Debian Trixie (with Preempt-RT kernel)
 
@@ -349,29 +330,6 @@ chmod +x linuxcnc-install.sh
 ----
 sudo ./linuxcnc-install.sh
 ----
-
-[[cha:Installing-RTAI]]
-=== Installing on Debian Trixie (with experimental RTAI kernel)
-
-. This kernel and LinuxCNC version can be installed on top of the Live DVD
-  install, or alternatively on a fresh Install of Debian Trixie 64-bit
-  as described above.
-. You can add the LinuxCNC archive signing key and repository information
-  by downloading and running the installer script as described above.
-  If an RTAI kernel is detected it will stop before installing any packages.
-. Update the package list from linuxcnc.org
-+
-----
-sudo apt-get update
-----
-. Remove the existing uspace version of LinuxCNC and install the new realtime kernel, RTAI and the RTAI-version of LinuxCNC.
-+
-----
-sudo apt-get purge linuxcnc-uspace
-sudo apt-get purge linuxcnc-doc*
-sudo apt-get install linuxcnc
-----
-Reboot the machine, ensuring that the system boots from the new 5.4.258-rtai kernel.
 
 === Installing on Raspbian 12
 

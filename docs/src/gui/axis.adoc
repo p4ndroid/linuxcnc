@@ -945,7 +945,7 @@ implementation and subject to change during the development cycle.
 
 The AXIS GUI includes a no-op (placeholder) function named 'user_hal_pins()'. +
 It is executed just after the .axisrc file is called and
-just before any GladeVCP panels / embedded tabs are initialized. +
+just before the AXIS HAL component is marked ready. +
 This function may be implemented
 within a `~/.axisrc` Python script or a '[DISPLAY]USER_COMMAND_FILE'
 Python script to make custom HAL pins that use the 'axisui.' prefix. +
@@ -959,15 +959,6 @@ available after defining the editor in the INI section [DISPLAY].
 Useful values include `EDITOR=gedit` and `EDITOR=gnome-terminal -e vim`.
 For more information, see the <<sub:ini:sec:display,Display Section>>
 of the INI Configuration Chapter.
-
-=== Virtual Control Panel
-
-(((AXIS: Virtual Control Panel)))
-AXIS can display a custom virtual control panel in either the right
-side column or the bottom row.
-Additionally one or more panels may be displayed as embedded tabs.
-You can program buttons, indicators, data displays and more.
-For more information, see the <<cha:pyvcp,PyVCP>> and the <<cha:glade-vcp,GladeVCP>> chapters.
 
 [[axis:preview-control]]
 === Preview Control
@@ -1229,28 +1220,22 @@ print('value is a',type(value),'value of',value)
 
 [source,python]
 ----
-# HAL pins from a GladeVCP panel will not be ready when user_live_update is run
-# to read them you need to put them in a try/except block
-
-# the following example assumes 5 HAL buttons in a GladeVCP panel used to switch
-# the tabs in the AXIS screen.
-# button names are 'manual-tab', 'mdi-tab', 'preview-tab', 'dro-tab', 'user0-tab'
-# the user_0 tab if it exists would be the first GladeVCP embedded tab
+# The following example assumes HAL buttons exported by user_hal_pins()
+# and connected from a pendant or another userspace HAL component.
+# button names are 'manual-tab', 'mdi-tab', 'preview-tab', 'numbers-tab'
 
 # for LinuxCNC 2.8+ branch
 
 def user_live_update():
     try:
-        if hal.get_value('gladevcp.manual-tab'):
+        if hal.get_value('axisui.manual-tab'):
             root_window.tk.call('.pane.top.tabs','raise','manual')
-        elif hal.get_value('gladevcp.mdi-tab'):
+        elif hal.get_value('axisui.mdi-tab'):
             root_window.tk.call('.pane.top.tabs','raise','mdi')
-        elif hal.get_value('gladevcp.preview-tab'):
+        elif hal.get_value('axisui.preview-tab'):
             root_window.tk.call('.pane.top.right','raise','preview')
-        elif hal.get_value('gladevcp.numbers-tab'):
+        elif hal.get_value('axisui.numbers-tab'):
             root_window.tk.call('.pane.top.right','raise','numbers')
-        elif hal.get_value('gladevcp.user0-tab'):
-            root_window.tk.call('.pane.top.right','raise','user_0')
     except:
         pass
 ----
@@ -1368,7 +1353,6 @@ print(vars.emcini.get())
     show_machine_limits     = IntVar
     show_machine_speed      = IntVar
     show_program            = IntVar
-    show_pyvcppanel         = IntVar
     show_rapids             = IntVar
     show_tool               = IntVar
     show_offsets            = IntVar

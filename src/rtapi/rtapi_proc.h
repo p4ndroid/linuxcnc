@@ -1,11 +1,11 @@
 #ifndef __LINUXCNC_RTAPI_PROC_H
 #define __LINUXCNC_RTAPI_PROC_H
 
-/** RTAPI is a library providing a uniform API for several real time
-  operating systems.  As of ver 2.0, RTLinux and RTAI are supported.
+/** RTAPI is a library providing a uniform API for LinuxCNC realtime and
+  non-realtime code. This reduced tree supports the POSIX uspace backend.
 */
 /********************************************************************
-* Description:  rtai_proc.h
+* Description:  rtapi_proc.h
 *               This file, 'rtapi_proc.h', contains code that 
 *               implements several /proc filesystem entries that can 
 *               display the status of the RTAPI.
@@ -20,9 +20,7 @@
 
 /** This file, 'rtapi_proc.h', contains code that implements several
     /proc filesystem entries that can display the status of the RTAPI.
-    This code is common to both the RTAI and RTLinux implementations,
-    and most likely to any other implementations under Linux.  This
-    data is INTERNAL to the RTAPI implementation, and should not be
+    This data is INTERNAL to the RTAPI implementation, and should not be
     included in any application modules.  This data also applies
     only to kernel modules, and should be included only in the
     real-time portion of the implementation.  Items that are common

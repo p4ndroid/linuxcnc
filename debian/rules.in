@@ -143,7 +143,7 @@ override_dh_compress:
 	dh_compress -X.pdf -X.txt -X.hal -X.ini -X.clp -X.var -X.nml -X.tbl -X.xml -Xsample-configs
 
 override_dh_fixperms:
-	dh_fixperms -X/linuxcnc_module_helper -X/rtapi_app
+	dh_fixperms -X/rtapi_app
 	# In case that only the indep packages are built
 	if [ -x  "$(DESTDIR)/usr/lib/tcltk/linuxcnc/linuxcnc.tcl" ]; then \
 		chmod -x $(DESTDIR)/usr/lib/tcltk/linuxcnc/linuxcnc.tcl; \

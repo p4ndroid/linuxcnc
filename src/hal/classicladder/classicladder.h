@@ -346,7 +346,7 @@ typedef struct StrInfosGene
 	int VScrollValue;
 	int HeaderLabelCommentHeight;
 	
-	/* how time for the last scan of the rungs in ns (if calc on RTLinux side) */
+	/* time for the last scan of the rungs in ns */
 	int DurationOfLastScan;
 	
 	int CurrentSection;

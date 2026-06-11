@@ -19,9 +19,8 @@ else:
     assert False, "failed to get exception on full stream"
 assert writer.num_overruns == 1
 
-# In rtai realtime, it's only permitted to map a shared memory region more
-# once in a free-running component, so the writer and reader of a stream can't
-# exist at the same time in the same process
+# The writer and reader of a stream should not exist at the same time in the
+# same process for this test.
 del writer
 
 reader = hal.stream(c, hal.streamer_base, "bfsu")

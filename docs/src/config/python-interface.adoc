@@ -913,8 +913,7 @@ inifile = linuxcnc.ini(stat.ini_filename)
 
 == The `linuxcnc.positionlogger` type
 
-Some usage hints can be gleaned from
-`src/emc/usr_intf/gremlin/gremlin.py`.
+Some usage hints can be gleaned from the AXIS preview implementation.
 
 === members
 

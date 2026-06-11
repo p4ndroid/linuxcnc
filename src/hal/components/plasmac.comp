@@ -340,8 +340,7 @@ variable float  pierce_old_x;               /* tracking the last x location duri
 variable float  pierce_old_y;               /* tracking the last y location during pierce */
 variable float  total_pierce_state_delay;   /* Total of pierce delay and cut motion delay */
 
-// temp for testing forum post #210558
-// https://forum.linuxcnc.org/plasmac/42690-is-this-qtplasmac-expected-behaviour-cycle-start-and-jog-disabled?start=0#210558
+// Keep jog/run interlock behavior consistent with plasma UI expectations.
 pin in  s32     low_cut_volts               "low cut voltage threshold while thc active";
 pin in  s32     target_samples = 6          "number of samples for setting target_volts";
 pin out float   target_volts                "target voltage for thc, set by arc voltage at cut height";

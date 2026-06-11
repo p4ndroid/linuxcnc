@@ -9,7 +9,7 @@
 # handlers: a GUI that absorbs SIGTERM and has to be SIGKILLed fails.
 #
 # <gui-process-match> is a pgrep -f pattern identifying the GUI process
-# (e.g. "bin/touchy", "bin/gmoccapy"). It must not match the linuxcnc
+# (for example "bin/axis"). It must not match the linuxcnc
 # launcher or task/motion helpers.
 #
 # Markers (consumed by checkresult-quit.sh):

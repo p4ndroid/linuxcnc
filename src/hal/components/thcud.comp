@@ -42,22 +42,9 @@ net requested-vel thcud.requested-vel <= motion.requested-vel
 
 net current-vel thcud.current-vel <= motion.current-vel
 
-PyVCP Connections
-In the XML file you need something like:
+Connect an external enable signal in the HAL file like this:
 
-[source,xml]
-----
-<pyvcp>
-<checkbutton>
-  <text>"THC Enable"</text>
-  <halpin>"thc-enable"</halpin>
-</checkbutton>
-</pyvcp>
-----
-
-Connect the PyVCP pins in the postgui.hal file like this:
-
-net thc-enable thcud.enable <= pyvcp.thc-enable
+net thc-enable thcud.enable <= some-enable-signal
 
 
 """;
@@ -143,4 +130,3 @@ FUNCTION(_) {
         z_fb_out = z_pos_in; // keep axis motor position fb from being confused
     }
 }
-

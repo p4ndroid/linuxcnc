@@ -195,7 +195,7 @@ long RtapiApp::clock_set_period(long nsecs) {
     return period;
 }
 
-//parse_cpu_list from https://gitlab.com/Xenomai/xenomai4/libevl/-/blob/11e6a1fb183a315ae861762e7650fd5e10d83ff5/tests/helpers.c
+// parse_cpu_list is based on MIT-licensed helper code.
 //License: MIT
 static void parse_cpu_list(const char *path, cpu_set_t *cpuset) {
     char *p, *range, *range_p = NULL, *id, *id_r;

@@ -35,7 +35,7 @@ In LinuxCNC v2.9 onwards the driver polls the Rx and Tx status registers every s
 The UART functions above can be included in your driver code by ``#include "hostmot2-serial.h"``.
 This will make the functions above available for use in your own C code.
 
-The UARTs are accessed by name, and the names will be printed to the terminal (or dmesg in the case of RTAI kernel realtime) when the board driver (hm2_eth, hm2_pci etc) is loaded.
+The UARTs are accessed by name, and the names will be printed to the terminal when the board driver (hm2_eth, hm2_pci etc) is loaded.
 Internally the UARTs are addressed by index, but the indices are per-card so not unambiguous.
 Internally the functions all use the private `hm2_get_pktuart` function which returns the index of the UART _and_ the low level driver instance it belongs to.
 These functions are not hard- private, you can `#include "hostmot2.h"` if you need the lower-level functions, but then need to track the board instances yourself.

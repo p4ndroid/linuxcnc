@@ -36,8 +36,8 @@ image::images/extra-pulse-reject.png["Reject Extra Pulse",align="center"]
 
 == External E-Stop
 
-The External E-Stop example is in the /config/classicladder/cl-estop
-folder. It uses a PyVCP panel to simulate the external components.
+The External E-Stop example shows how to connect external E-Stop inputs
+through ClassicLadder.
 
 To interface an external E-Stop to LinuxCNC and have the external E-Stop
 work together with the internal E-Stop requires a couple of connections
@@ -81,10 +81,10 @@ loadusr classicladder --nogui estop.clp
 
 I/O assignments
 
-- %I0 = Input from the PyVCP panel simulated E-Stop (the checkbox)
+- %I0 = Input from the external E-Stop circuit
 - %I1 = Input from LinuxCNC's E-Stop
 - %I2 = Input from LinuxCNC's E-Stop Reset Pulse
-- %I3 = Input from the PyVCP panel reset button
+- %I3 = Input from the external reset button
 - %Q0 = Output to LinuxCNC to enable
 - %Q1 = Output to external driver board enable pin (use a N/C output if
   your board had a disable pin)
@@ -93,16 +93,16 @@ Next we add the following lines to the custom_postgui.hal file
 
 [source,hal]
 ----
-# E-Stop example using PyVCP buttons to simulate external components
+# E-Stop example using external components
 
-# The PyVCP checkbutton simulates a normally closed external E-Stop
-net ext-estop classicladder.0.in-00 <= pyvcp.py-estop
+# The external E-Stop input is normally closed
+net ext-estop classicladder.0.in-00 <= external.estop-ok
 
 # Request E-Stop Enable from LinuxCNC
 net estop-all-ok iocontrol.0.emc-enable-in <= classicladder.0.out-00
 
-# Request E-Stop Enable from PyVCP or external source
-net ext-estop-reset classicladder.0.in-03 <= pyvcp.py-reset
+# Request E-Stop Enable from external reset source
+net ext-estop-reset classicladder.0.in-03 <= external.estop-reset
 
 # This line resets the E-Stop from LinuxCNC
 net emc-reset-estop iocontrol.0.user-request-enable => classicladder.0.in-02
@@ -110,34 +110,8 @@ net emc-reset-estop iocontrol.0.user-request-enable => classicladder.0.in-02
 # This line enables LinuxCNC to unlatch the E-Stop in ClassicLadder
 net emc-estop iocontrol.0.user-enable-out => classicladder.0.in-01
 
-# This line turns on the green indicator when out of E-Stop
-net estop-all-ok => pyvcp.py-es-status
-----
-
-Next we add the following lines to the panel.xml file. Note you have
-to open it with the text editor not the default html viewer.
-
-[source,xml]
-----
-<pyvcp>
-<vbox>
-<label><text>"E-Stop Demo"</text></label>
-<led>
-<halpin>"py-es-status"</halpin>
-<size>50</size>
-<on_color>"green"</on_color>
-<off_color>"red"</off_color>
-</led>
-<checkbutton>
-<halpin>"py-estop"</halpin>
-<text>"E-Stop"</text>
-</checkbutton>
-</vbox>
-<button>
-<halpin>"py-reset"</halpin>
-<text>"Reset"</text>
-</button>
-</pyvcp>
+# This line turns on an external indicator when out of E-Stop
+net estop-all-ok => external.estop-status
 ----
 
 Now start up your config and it should look like this.
@@ -147,7 +121,7 @@ Now start up your config and it should look like this.
 image::images/axis_cl-estop.png["AXIS E-Stop",align="center"]
 
 Note that in this example like in real life you must clear the remote
-E-Stop (simulated by the checkbox) before the AXIS E-Stop or the
+E-Stop input before the AXIS E-Stop or the
 external Reset will put you in OFF mode. If the E-Stop in the AXIS
 screen was pressed, you must press it again to clear it. You cannot
 reset from the external after you do an E-Stop in AXIS.

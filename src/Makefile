@@ -137,9 +137,7 @@ ifeq ($(origin KERNELRELEASE),undefined)
 # The "modules" target is the gateway to the kernel module build.
 build-software: headers userspace modules
 ifeq ($(RUN_IN_PLACE),yes)
-ifneq ($(BUILD_SYS),uspace)
-	@if [ -f ../bin/linuxcnc_module_helper ]; then if ! [ `id -u` = 0 -a -O ../bin/linuxcnc_module_helper -a -u ../bin/linuxcnc_module_helper ]; then $(VECHO) "You now need to run 'sudo make setuid' in order to run in place."; fi; fi
-else
+ifeq ($(BUILD_SYS),uspace)
 	@if [ -f ../bin/rtapi_app ]; then \
 	    if [ `id -u` = 0 -a -O ../bin/rtapi_app -a -u ../bin/rtapi_app ]; then :; \
 	    elif PATH="/sbin:/usr/sbin:$$PATH" command -v getcap >/dev/null 2>&1 \
@@ -184,16 +182,12 @@ SUBDIRS := \
     hal/user_comps/huanyang-vfd \
 	hal/user_comps/xhc-whb04b-6 \
     \
-    emc/usr_intf/axis emc/usr_intf/touchy emc/usr_intf/stepconf emc/usr_intf/pncconf \
-    emc/usr_intf/gremlin emc/usr_intf/gscreen emc/usr_intf/pyui emc/usr_intf/qtvcp \
-    emc/usr_intf/gmoccapy emc/usr_intf/qtplasmac emc/usr_intf/mdro\
+    emc/usr_intf/axis \
     emc/usr_intf emc/nml_intf emc/task emc/kinematics emc/tp emc/canterp \
     emc/motion emc/ini emc/rs274ngc emc/sai emc/pythonplugin \
     emc/motion-logger \
     emc/tooldata \
     emc \
-    \
-    module_helper \
     \
     po \
     \
@@ -352,7 +346,7 @@ config.h: config.h.in config.status
 
 INFILES = \
         ../scripts/linuxcnc ../scripts/realtime \
-	../scripts/linuxcnc_info ../scripts/setup_designer \
+	../scripts/linuxcnc_info \
 	../scripts/haltcl ../scripts/rtapi.conf Makefile.inc Makefile.modinc \
 	../tcl/linuxcnc.tcl ../scripts/halrun ../scripts/rip-environment \
 	../scripts/linuxcncmkdesktop \
@@ -364,8 +358,6 @@ INFILES = \
 	../share/applications/linuxcnc.desktop \
 	../share/applications/linuxcnc-latency.desktop \
 	../share/applications/linuxcnc-latency-histogram.desktop \
-	../share/applications/linuxcnc-pncconf.desktop \
-	../share/applications/linuxcnc-stepconf.desktop \
 	../scripts/linuxcnc_var \
 	../scripts/halcmd_twopass \
 	../scripts/runtests \
@@ -441,7 +433,6 @@ TARGETS += headers
 
 # Add converting of %.po files
 TARGETS += $(patsubst po/%.po, ../share/locale/%/LC_MESSAGES/linuxcnc.mo, $(wildcard po/*.po))
-TARGETS += $(patsubst po/gmoccapy/%.po, ../share/locale/%/LC_MESSAGES/gmoccapy.mo, $(wildcard po/gmoccapy/*.po))
 TARGETS += $(patsubst po/%.po, objects/%.msg, $(wildcard po/*.po))
 
 # tooledit as standalone app:
@@ -460,24 +451,6 @@ TARGETS += ../bin/ngcgui
 	$(Q)(echo "#!$(TCLSH)")>|$@
 	$(Q)(echo "source $(EMC2_TCL_LIB_DIR)/ngcgui.tcl")>>$@
 	$(Q)(echo "::ngcgui::standalone_ngcgui")>>$@
-	$(Q)chmod +x $@
-
-# pyngcgui as standalone app:
-TARGETS += ../bin/pyngcgui
-../bin/pyngcgui: Makefile
-	$(Q)rm -f $@
-	$(Q)(echo "#!$(PYTHON)")>|$@
-	$(Q)(echo "import pyngcgui")>>$@
-	$(Q)(echo "pyngcgui.standalone_pyngcgui()")>>$@
-	$(Q)chmod +x $@
-
-# gremlin_view as standalone app:
-TARGETS += ../bin/gremlin_view
-../bin/gremlin_view: Makefile
-	$(Q)rm -f $@
-	$(Q)(echo "#!$(PYTHON)")>|$@
-	$(Q)(echo "import gremlin_view")>>$@
-	$(Q)(echo "gremlin_view.standalone_gremlin_view()")>>$@
 	$(Q)chmod +x $@
 
 # halshow as standalone app:
@@ -571,8 +544,6 @@ else
 	chown root ../bin/pci_read
 	chmod 4750 ../bin/pci_read
 endif
-	chown root ../bin/linuxcnc_module_helper
-	chmod 4750 ../bin/linuxcnc_module_helper
 
 # File capabilities alternative to setuid (uspace only).
 # Grants rtapi_app the kernel privileges it needs without running as root:
@@ -614,8 +585,6 @@ XDGDESKTOP = \
     ../share/applications/linuxcnc.desktop \
     ../share/applications/linuxcnc-latency.desktop \
     ../share/applications/linuxcnc-latency-histogram.desktop \
-    ../share/applications/linuxcnc-pncconf.desktop \
-    ../share/applications/linuxcnc-stepconf.desktop \
 
 ifeq ($(RUN_IN_PLACE),yes)
 define ERROR_MESSAGE
@@ -663,19 +632,7 @@ install-dirs:
 		$(DESTDIR)$(localedir)/de/LC_MESSAGES \
 		$(DESTDIR)$(datadir)/axis/images \
 		$(DESTDIR)$(datadir)/axis/tcl \
-		$(DESTDIR)$(datadir)/gscreen/images \
-		$(DESTDIR)$(datadir)/gscreen/skins \
-		$(DESTDIR)$(datadir)/qtvcp/images \
-		$(DESTDIR)$(datadir)/qtvcp/screens \
-		$(DESTDIR)$(datadir)/qtvcp/panels \
-		$(DESTDIR)$(datadir)/qtvcp/widgets_ui \
-		$(DESTDIR)$(datadir)/gmoccapy/icons \
-		$(DESTDIR)$(datadir)/glade/catalogs \
-		$(DESTDIR)$(datadir)/glade/pixmaps/hicolor/22x22/actions \
 		$(DESTDIR)$(datadir)/gtksourceview-4/language-specs \
-		$(DESTDIR)$(datadir)/linuxcnc/stepconf \
-		$(DESTDIR)$(datadir)/linuxcnc/pncconf \
-		$(DESTDIR)$(datadir)/linuxcnc/pncconf/pncconf-help \
 		$(DESTDIR)$(datadir)/linuxcnc/hallib
 
 install-kernel-indep: install-dirs
@@ -697,10 +654,9 @@ install-kernel-indep: install-dirs
 	$(DIR) $(DESTDIR)$(sampleconfsdir)
 	((cd ../configs && tar --exclude CVS --exclude .cvsignore --exclude .gitignore -cf - .) | (cd $(DESTDIR)$(sampleconfsdir) && tar -xf -))
 
-	$(EXE) $(filter-out ../bin/rtapi_app ../bin/linuxcnc_module_helper ../bin/pci_write ../bin/pci_read ../bin/test_rtapi_vsnprintf, $(filter ../bin/%,$(TARGETS))) $(DESTDIR)$(bindir)
+	$(EXE) $(filter-out ../bin/rtapi_app ../bin/pci_write ../bin/pci_read ../bin/test_rtapi_vsnprintf, $(filter ../bin/%,$(TARGETS))) $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/linuxcnc $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/linuxcnc_info $(DESTDIR)$(bindir)
-	$(EXE) ../scripts/setup_designer $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/linuxcnc_var $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/monitor-xhc-hb04 $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/latency-test $(DESTDIR)$(bindir)
@@ -709,8 +665,6 @@ install-kernel-indep: install-dirs
 	$(EXE) ../scripts/moveoff_gui $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/hal-histogram $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/xhc-hb04-accels $(DESTDIR)$(bindir)
-	$(EXE) ../scripts/pyvcp_demo $(DESTDIR)$(bindir)
-	$(EXE) ../scripts/gladevcp_demo $(DESTDIR)$(bindir)
 	$(EXE) ../scripts/linuxcncmkdesktop $(DESTDIR)$(bindir)
 	$(EXE) ../bin/update_ini $(DESTDIR)$(bindir)
 	$(EXE) ../bin/linuxcnc_check_ini $(DESTDIR)$(bindir)
@@ -731,22 +685,9 @@ install-kernel-indep: install-dirs
 	$(EXE) $(TCL_BIN) $(DESTDIR)$(tcldir)/bin
 	$(FILE) ../tcl/scripts/balloon.tcl ../tcl/scripts/emchelp.tcl $(DESTDIR)$(tcldir)/scripts
 	$(EXE) ../tcl/scripts/Set_Coordinates.tcl $(DESTDIR)$(tcldir)/scripts
-	$(FILE) ../share/linuxcnc/*.glade $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../share/linuxcnc/stepconf/*.glade $(DESTDIR)$(prefix)/share/linuxcnc/stepconf
-	$(FILE) ../share/linuxcnc/touchy.glade $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../share/linuxcnc/gscreen.glade $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../share/linuxcnc/gscreen2.glade $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../share/gmoccapy/gmoccapy.glade $(DESTDIR)$(prefix)/share/gmoccapy
-	$(FILE) ../share/linuxcnc/pncconf/*.glade $(DESTDIR)$(prefix)/share/linuxcnc/pncconf
-	$(FILE) ../share/linuxcnc/gremlin_view.ui $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../share/linuxcnc/popupkeyboard.ui $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../configs/common/linuxcnc.nml     $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../configs/common/linuxcnc_big.nml $(DESTDIR)$(prefix)/share/linuxcnc
-	$(FILE) ../src/emc/usr_intf/pncconf/pncconf-help/*.txt $(DESTDIR)$(prefix)/share/linuxcnc/pncconf/pncconf-help
-	$(FILE) ../src/emc/usr_intf/pncconf/pncconf-help/*.png $(DESTDIR)$(prefix)/share/linuxcnc/pncconf/pncconf-help
-
-	$(FILE) ../lib/python/gladevcp/hal_python.xml $(DESTDIR)$(datadir)/glade/catalogs/
-	$(FILE) ../share/glade/pixmaps/hicolor/22x22/actions/widget*.png  $(DESTDIR)$(datadir)/glade/pixmaps/hicolor/22x22/actions/
 
 	$(FILE) ../share/gtksourceview-4/language-specs/*.lang  $(DESTDIR)$(datadir)/gtksourceview-4/language-specs/
 
@@ -756,56 +697,15 @@ install-kernel-indep: install-python
 install-python: install-dirs
 	$(DIR) $(DESTDIR)$(SITEPY) $(DESTDIR)$(SITEPY)/rs274
 	$(DIR) $(DESTDIR)$(SITEPY)/common
-	$(DIR) $(DESTDIR)$(SITEPY)/touchy
-	$(DIR) $(DESTDIR)$(SITEPY)/gscreen
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/designer/
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/writer
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/writer/ext
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/qtplasmac
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/qt_vismach
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/qt_ngcgui
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/qt_pdf
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/lib/gcode_utility
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/plugins
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/widgets
-	$(DIR) $(DESTDIR)$(SITEPY)/qtvcp/widgets/widget_icons
-	$(DIR) $(DESTDIR)$(SITEPY)/gmoccapy
-	$(DIR) $(DESTDIR)$(SITEPY)/gladevcp
-	$(DIR) $(DESTDIR)$(SITEPY)/stepconf
-	$(DIR) $(DESTDIR)$(SITEPY)/pncconf
-	$(DIR) $(DESTDIR)$(SITEPY)/pyui
-	$(DIR) $(DESTDIR)$(SITEPY)/plasmac
 	$(FILE) ../lib/python/*.py ../lib/python/*.so $(DESTDIR)$(SITEPY)
 	$(FILE) ../lib/python/common/*.py $(DESTDIR)$(SITEPY)/common
 	$(FILE) ../lib/python/rs274/*.py $(DESTDIR)$(SITEPY)/rs274
-	$(FILE) ../lib/python/touchy/*.py $(DESTDIR)$(SITEPY)/touchy
-	$(FILE) ../lib/python/gscreen/*.py $(DESTDIR)$(SITEPY)/gscreen
-	$(FILE) ../lib/python/qtvcp/*.{py,ui,txt} $(DESTDIR)$(SITEPY)/qtvcp
-	$(FILE) ../lib/python/qtvcp/designer/*.txt $(DESTDIR)$(SITEPY)/qtvcp/designer
-	$(FILE) ../lib/python/qtvcp/widgets/*.py $(DESTDIR)$(SITEPY)/qtvcp/widgets
-	$(FILE) ../lib/python/qtvcp/widgets/widget_icons/*.{png,gif} $(DESTDIR)$(SITEPY)/qtvcp/widgets/widget_icons
-	$(FILE) ../lib/python/qtvcp/plugins/*.py $(DESTDIR)$(SITEPY)/qtvcp/plugins
-	$(TREE) ../lib/python/qtvcp/lib/* $(DESTDIR)$(SITEPY)/qtvcp/lib
-	$(FILE) ../lib/python/gmoccapy/*.py $(DESTDIR)$(SITEPY)/gmoccapy
-	$(FILE) ../lib/python/gladevcp/*.{py,png,glade} $(DESTDIR)$(SITEPY)/gladevcp
-	$(FILE) ../lib/python/stepconf/*.py $(DESTDIR)$(SITEPY)/stepconf
-	$(FILE) ../lib/python/pncconf/*.py $(DESTDIR)$(SITEPY)/pncconf
-	$(FILE) ../lib/python/pyui/*.py $(DESTDIR)$(SITEPY)/pyui
-	$(FILE) ../lib/python/plasmac/*.py $(DESTDIR)$(SITEPY)/plasmac
-	$(EXE) ../bin/stepconf $(DESTDIR)$(bindir)
-	$(EXE) ../bin/pncconf $(DESTDIR)$(bindir)
-	$(EXE) ../bin/pyui $(DESTDIR)$(bindir)
 	$(EXE) ../bin/hal_input $(DESTDIR)$(bindir)
-	$(EXE) ../bin/hal_bridge $(DESTDIR)$(bindir)
 	$(EXE) ../bin/mitsub_vfd $(DESTDIR)$(bindir)
 	$(EXE) ../bin/mqtt-publisher $(DESTDIR)$(bindir)
 	$(EXE) ../bin/z_level_compensation $(DESTDIR)$(bindir)
 	$(EXE) ../bin/pmx485 $(DESTDIR)$(bindir)
 	$(EXE) ../bin/sim-torch $(DESTDIR)$(bindir)
-	$(EXE) ../bin/pyvcp $(DESTDIR)$(bindir)
-	$(EXE) ../bin/gladevcp $(DESTDIR)$(bindir)
 	$(EXE) ../bin/axis $(DESTDIR)$(bindir)
 	$(EXE) ../bin/axis-remote $(DESTDIR)$(bindir)
 	$(EXE) ../bin/debuglevel $(DESTDIR)$(bindir)
@@ -813,32 +713,17 @@ install-python: install-dirs
 	$(EXE) ../bin/mdi $(DESTDIR)$(bindir)
 	$(EXE) ../bin/hal_manualtoolchange $(DESTDIR)$(bindir)
 	$(EXE) ../bin/image-to-gcode $(DESTDIR)$(bindir)
-	$(EXE) ../bin/touchy $(DESTDIR)$(bindir)
-	$(EXE) ../bin/gscreen $(DESTDIR)$(bindir)
-	$(EXE) ../bin/qtvcp $(DESTDIR)$(bindir)
-	$(EXE) ../lib/python/qtvcp/designer/install_script $(DESTDIR)$(SITEPY)/qtvcp/designer/
-	$(EXE) ../bin/gmoccapy $(DESTDIR)$(bindir)
 	$(EXE) ../bin/teach-in $(DESTDIR)$(bindir)
 	$(EXE) ../bin/scorbot-er-3 $(DESTDIR)$(bindir)
 	$(EXE) $(patsubst %.py,../bin/%,$(VISMACH_PY)) $(DESTDIR)$(bindir)
-	$(EXE) $(patsubst %.py,../bin/%,$(QTPLASMAC_PY)) $(DESTDIR)$(bindir)
-	$(FILE) ../share/linuxcnc/linuxcnc-wizard.gif $(DESTDIR)$(prefix)/share/linuxcnc
 	$(FILE) ../share/axis/images/*.{png,gif,xbm,ngc} $(DESTDIR)$(datadir)/axis/images
 	$(FILE) ../share/axis/tcl/*.tcl $(DESTDIR)$(datadir)/axis/tcl
-	$(FILE) ../share/gscreen/images/*.gif $(DESTDIR)$(datadir)/gscreen/images
-	$(TREE) ../share/gscreen/skins/* $(DESTDIR)$(datadir)/gscreen/skins
-	$(TREE) ../share/qtvcp/images/* $(DESTDIR)$(datadir)/qtvcp/images
-	$(TREE) ../share/qtvcp/screens/* $(DESTDIR)$(datadir)/qtvcp/screens
-	$(TREE) ../share/qtvcp/panels/* $(DESTDIR)$(datadir)/qtvcp/panels
-	$(TREE) ../share/qtvcp/widgets_ui/* $(DESTDIR)$(datadir)/qtvcp/widgets_ui
-	$(TREE) ../share/gmoccapy/icons/* $(DESTDIR)$(datadir)/gmoccapy/icons
 
 install-kernel-dep:
 	$(DIR)	$(DESTDIR)$(moduledir)/linuxcnc \
 		$(DESTDIR)$(bindir) \
 		$(DESTDIR)$(sysconfdir)/linuxcnc
 	$(FILE) ../rtlib/*$(MODULE_EXT) $(DESTDIR)$(EMC2_RTLIB_DIR)
-	$(SETUID) ../bin/linuxcnc_module_helper $(DESTDIR)$(bindir)
 ifneq "$(BUILD_SYS)" "uspace"
 	$(FILE) Module.symvers $(DESTDIR)$(EMC2_RTLIB_DIR)
 	$(SETUID) ../bin/pci_write $(DESTDIR)$(bindir)
@@ -875,12 +760,6 @@ EXTRA_CFLAGS := $(filter-out -ffast-math,$(RTFLAGS)) -D__MODULE__ \
 	-fno-fast-math $(call cc-option,-mieee-fp) -fno-unsafe-math-optimizations \
 	-Wno-declaration-after-statement \
 	$(INTEGER_OVERFLOW_FLAGS)
-ifneq ($(KERNELRELEASE),)
-ifeq ($(RTARCH):$(RTAI):$(filter $(RTFLAGS),-msse),x86_64:3:)
-EXTRA_CFLAGS += -msse
-EXTRA_CFLAGS += -g
-endif
-endif
 EXTRA_CFLAGS += -fno-builtin-sin -fno-builtin-cos -fno-builtin-sincos
 
 ifdef SEQUENTIAL_SUPPORT
@@ -979,7 +858,6 @@ hal_gm-objs := hal/drivers/hal_gm.o $(MATHSTUB)
 obj-$(CONFIG_HAL_PPMC) += hal_ppmc.o
 hal_ppmc-objs := hal/drivers/hal_ppmc.o $(MATHSTUB)
 
-#Don't attempt to build Pi / Beaglebone GPIO for RTAI
 ifeq ($(BUILD_SYS),uspace)
 obj-$(CONFIG_HAL_BB_GPIO) += hal_bb_gpio.o
 hal_bb_gpio-objs  :=			\
@@ -1136,7 +1014,7 @@ ifeq ($(origin userkfuncs), undefined)
   USERKFUNCS = emc/kinematics/userkfuncs.o
 else
   # user specified file for userkfuncs
-  # works with rtpreempt only (not rtai)
+  # works with rtpreempt only
   ifeq ("$(wildcard $(userkfuncs))","")
     $(error No such file: $(userkfuncs))
   endif

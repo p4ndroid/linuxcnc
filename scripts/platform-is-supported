@@ -31,7 +31,7 @@ if sys.version_info.minor < 9:
 
 supported_oses = [ 'linux' ]
 supported_cpus = [ 'amd64', 'i386', 'arm' ]
-supported_kernel_flavors = [ 'rtai', 'rtpreempt', 'vanilla' ]
+supported_kernel_flavors = [ 'rtpreempt', 'vanilla' ]
 
 
 def detect_os():
@@ -47,18 +47,11 @@ def detect_kernel_flavor(uname):
     l = f.read(-1)
     f.close()
 
-    config_ipipe = re.search('^CONFIG_IPIPE', l, re.MULTILINE)
-    config_xeno = re.search('^CONFIG_XENO_', l, re.MULTILINE)
     config_rtpreempt = re.search('^CONFIG_PREEMPT_RT', l, re.MULTILINE)
 
-    if config_ipipe and not config_xeno and not config_rtpreempt:
-        return 'rtai'
-    elif config_ipipe and config_xeno and not config_rtpreempt:
-        return 'xenomai'
-    elif not config_ipipe and not config_xeno and config_rtpreempt:
+    if config_rtpreempt:
         return 'rtpreempt'
-    else:
-        return 'vanilla'
+    return 'vanilla'
 
 
 os = detect_os()
@@ -68,7 +61,7 @@ if os == 'linux':
     distributor = subprocess.check_output(['lsb_release', '--id', '--short']).strip().decode()
     release = subprocess.check_output(['lsb_release', '--release', '--short']).strip().decode()
     try:
-        major, minor = re.split('\.', release)
+        major, minor = re.split(r'\.', release)
     except ValueError as e:
         major = release
         minor = "0"
@@ -120,4 +113,3 @@ if kernel_flavor not in supported_kernel_flavors:
 
 print("this platform is supported!")
 sys.exit(0)
-

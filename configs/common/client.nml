@@ -4,9 +4,9 @@
 # that is running the realtime code. Change the NML_FILE in emc.ini to
 # client.nml and (after the server side is running) run the GUI with:
 #
-#        tcl/tkemc.tcl -ini emc.ini
+#        linuxcnc emc.ini
 #
-# Note: tkemc.tcl does not need to be run as 'root'.
+# Note: LinuxCNC does not need to be run as 'root'.
 
 # Buffers
 # Name                  Type    Host             size    neut?   (old)   buffer# MP ---

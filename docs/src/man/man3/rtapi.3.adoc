@@ -6,8 +6,8 @@ rtapi - Introduction to the RTAPI API
 
 == DESCRIPTION
 
-RTAPI is a library providing a uniform API for several real time operating systems.
-As of LinuxCNC 2.7, POSIX threads and RTAI are supported.
+RTAPI is a library providing a uniform API for LinuxCNC realtime code.
+This reduced tree supports POSIX threads in the uspace runtime.
 
 == HEADER FILES
 

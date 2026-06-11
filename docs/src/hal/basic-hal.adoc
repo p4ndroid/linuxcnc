@@ -225,7 +225,7 @@ The command `sets` sets the value of a signal.
 [source,hal]
 ----
 sets <signal-name> <value>
-net mysignal and2.0.in0 pyvcp.my-led
+net mysignal and2.0.in0 indicator.my-led
 sets mysignal 1
 ----
 

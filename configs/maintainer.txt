@@ -13,7 +13,7 @@ each with one or more ini files, that are intended to:
      by the configuration picker (pickconfig.tcl)
 
 Note: Special cases
-      Any file named _panelui.ini is ignored
+      Auxiliary generated INI fragments may be ignored by picker tooling.
 
 Additionally, demonstration scripts identified by a file
 extension .demo, can run standalone to show linuxcnc-related
@@ -51,7 +51,7 @@ picker:
   2) creates a directory ~/linuxcnc/nc_files (if it
      does not exist).  It creates links in this directory
      to the system locations for examples and libraries
-     (examples, ngcgui_lib, gladevcp_lib)
+     (examples, ngcgui_lib)
 
   3) edits all ini files being copied so that
      [DISPLAY]PROGRAM_PREFIX = ~/linuxcnc/nc_files.

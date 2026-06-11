@@ -15,8 +15,7 @@ source [file join [file dirname [info script]] .. linuxcnc.tcl]
 ###############################################################
 # emctesting.tcl
 # EMC performance testing program
-# Needs emcsh to run-- this is sourced by tkemc, but it can be run
-# standalone. Make sure directory containing emcsh is in your path,
+# Needs emcsh to run. Make sure directory containing emcsh is in your path,
 # or edit the exec line above with the path to emcsh.
 
 eval emc_init $argv
@@ -99,7 +98,4 @@ proc popupTesting {{w .testingwindow}} {
     bind $w <Return> "popdownTesting $w"
 }
 
-# if we're not running inside tkemc, then pop us up in root window
-if {! [info exists tkemc]} {
-    popupTesting .
-}
+popupTesting .

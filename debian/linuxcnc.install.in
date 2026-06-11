@@ -7,15 +7,9 @@ usr/bin/classicladder
 usr/bin/debuglevel
 usr/bin/elbpcom
 usr/bin/genserkins
-usr/bin/gladevcp
-usr/bin/gladevcp_demo
-usr/bin/gmoccapy
-usr/bin/gremlin_view
 usr/bin/gs2_vfd
-usr/bin/gscreen
 usr/bin/hal-histogram
 usr/bin/hal_input
-usr/bin/hal_bridge
 usr/bin/hal_manualtoolchange
 usr/bin/halcmd
 usr/bin/halcmd_twopass
@@ -43,7 +37,6 @@ usr/bin/lineardelta
 usr/bin/linuxcnc
 usr/bin/linuxcnc_check_ini
 usr/bin/linuxcnc_info
-usr/bin/linuxcnc_module_helper
 usr/bin/linuxcnc_var
 usr/bin/linuxcnclcd
 usr/bin/linuxcncmkdesktop
@@ -65,20 +58,10 @@ usr/bin/monitor-xhc-hb04
 usr/bin/motion-logger
 usr/bin/moveoff_gui
 usr/bin/ngcgui
-usr/bin/panelui
 usr/bin/pi500_vfd
 usr/bin/pmx485
-usr/bin/pmx485-test
-usr/bin/pncconf
 usr/bin/puma560gui
 usr/bin/pumagui
-usr/bin/pyngcgui
-usr/bin/pyui
-usr/bin/pyvcp
-usr/bin/pyvcp_demo
-usr/bin/qtplasmac-materials
-usr/bin/qtplasmac_gcode
-usr/bin/qtvcp
 usr/bin/rotarydelta
 usr/bin/rs274
 usr/bin/rtapi_app
@@ -86,19 +69,16 @@ usr/bin/scaragui
 usr/bin/schedrmt
 usr/bin/scorbot-er-3
 usr/bin/sendkeys
-usr/bin/setup_designer
 usr/bin/shuttle
 usr/bin/sim-torch
 usr/bin/sim_pin
 usr/bin/simulate_probe
-usr/bin/stepconf
 usr/bin/svd-ps_vfd
 usr/bin/teach-in
 usr/bin/thermistor
 usr/bin/tool_mmap_read
 usr/bin/tool_watch
 usr/bin/tooledit
-usr/bin/touchy
 usr/bin/update_ini
 usr/bin/vfdb_vfd
 usr/bin/vfs11_vfd
@@ -116,20 +96,12 @@ usr/lib/python3
 usr/lib/tcltk
 
 usr/share/axis
-usr/share/glade
-usr/share/gmoccapy
-usr/share/gscreen
 usr/share/gtksourceview-4
 
 usr/share/applications/linuxcnc.desktop
 usr/share/applications/linuxcnc-latency.desktop
 usr/share/applications/linuxcnc-latency-histogram.desktop
-usr/share/applications/linuxcnc-pncconf.desktop
-usr/share/applications/linuxcnc-stepconf.desktop
 
-usr/share/linuxcnc/gremlin_view.ui
-usr/share/linuxcnc/gscreen2.glade
-usr/share/linuxcnc/gscreen.glade
 usr/share/linuxcnc/hallib/
 usr/share/linuxcnc/linuxcnc_big.nml
 usr/share/linuxcnc/linuxcnc.gif
@@ -137,14 +109,9 @@ usr/share/linuxcnc/linuxcncicon.png
 usr/share/linuxcnc/linuxcnc.nml
 usr/share/linuxcnc/linuxcnc-wizard.gif
 usr/share/linuxcnc/ncfiles/
-usr/share/linuxcnc/pncconf/
 usr/share/linuxcnc/popupkeyboard.ui
-usr/share/linuxcnc/stepconf/
-usr/share/linuxcnc/touchy.glade
 
 usr/share/locale
-
-usr/share/qtvcp
 
 src/emc/usr_intf/axis/etc    usr/share/doc/@MAIN_PACKAGE_NAME@/axis
 src/emc/usr_intf/axis/README usr/share/doc/@MAIN_PACKAGE_NAME@/axis

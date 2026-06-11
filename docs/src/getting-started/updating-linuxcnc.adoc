@@ -59,10 +59,6 @@ If you see (as above) `-rt-` in the kernel name then you are running the
 preempt-rt kernel and should install the "uspace" version of LinuxCNC.
 You should also install uspace for "sim" configs on non-realtime kernels.
 
-If you see `-rtai-` in the kernel name then you are running RTAI realtime.
-See below for the LinuxCNC version to install.
-RTAI packages are available for Bookworm and Buster but not currently for Bullseye.
-
 [[_setting_apt_sources]]
 === Apt Sources Configuration
 
@@ -89,9 +85,7 @@ RTAI packages are available for Bookworm and Buster but not currently for Bullse
 | OS / Realtime Version      | Repository
 | Debian Bullseye - preempt m| deb https://linuxcnc.org bullseye base 2.9-uspace
 | Debian Bookworm - preempt m| deb https://linuxcnc.org bookworm base 2.9-uspace
-| Debian Bookworm - RTAI    m| deb https://linuxcnc.org bookworm base 2.9-rt
 | Debian Trixie - preempt   m| deb https://linuxcnc.org trixie base 2.9-uspace
-| Debian Trixie - RTAI      m| deb https://linuxcnc.org trixie base 2.9-rt
 |===
 
 .Figure with a screenshot of the repository configuration of the synaptic package manager.
@@ -115,7 +109,7 @@ Debian uses the Synaptic Package Manager.
 * Open Synaptic using the instructions in <<_setting_apt_sources,Setting apt sources>> above.
 * Click the `Reload` button.
 * Use the Search function to search for `linuxcnc`.
-* The package is called "linuxcnc" for RTAI kernels and "linuxcnc-uspace" for preempt-rt.
+* The package is called "linuxcnc-uspace" for preempt-rt.
 * Click the check box to mark the new linuxcnc and linuxcnc-doc-* packages for upgrade.
   The package manager may select a number of additional packages to be installed,
   to satisfy dependencies that the new linuxcnc package has.
@@ -145,7 +139,7 @@ Codename:       trixie
 ----
 
 Pick the OS from the list then pick the major version you want like
-2.9-rt for RTAI or 2.9-uspace for preempt-rt.
+2.9-uspace for preempt-rt.
 
 Next pick the type of computer you have: binary-amd64 for 64-bit PC or
 binary-arm64 (64bit) for Raspberry Pi.
@@ -218,24 +212,11 @@ HOME_SEARCH_VELOCITY = 100 - Accepted but currently does nothing
 HOME_SEQUENCE = 0 - Accepted but currently does nothing
 
 
-== Updating Configuration Files for 2.10.y
-
-Touchy: the Touchy MACRO entries should now be placed in a [MACROS]
-section of the INI rather than in the [TOUCHY] section. This is part of
-a process of commonising the INI setting between GUIs. 
-
-
 == New HAL components
 
 === Non-Realtime
-mdro
 mqtt-publisher
 pi500_vfd
-pmx485-test
-qtplasmac-cfg2prefs
-qtplasmac-materials
-qtplasmac-plasmac2qt
-qtplasmac-setup
 sim-torch
 svd-ps_vfd
 
@@ -262,5 +243,3 @@ http://linuxcnc.org/docs/2.9/html/drivers/mesa_modbus.html
 A new GPIO driver for any GPIO which is supported by the gpiod library
 is now included:
 http://linuxcnc.org/docs/2.9/html/drivers/hal_gpio.html
-
-

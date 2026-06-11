@@ -1,3 +1,0 @@
-loadusr -Wn mypanel pyvcp -c mypanel test.xml
-show pin
-exit 0

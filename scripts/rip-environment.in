@@ -101,12 +101,6 @@ else
     MANPATH=$EMC2_HOME/docs/build/man:"$MANPATH"
 fi
 
-if [ -z "$GLADE_CATALOG_SEARCH_PATH" ]; then
-    GLADE_CATALOG_SEARCH_PATH=$EMC2_HOME/lib/python/gladevcp
-else
-    GLADE_CATALOG_SEARCH_PATH=$EMC2_HOME/lib/python/gladevcp:"$GLADE_CATALOG_SEARCH_PATH"
-fi
-
 if ! $as_command; then
     # TODO: if these completion directives give trouble for any versions
     # of bash actively in use, protect them with checks of BASH_VERSINFO

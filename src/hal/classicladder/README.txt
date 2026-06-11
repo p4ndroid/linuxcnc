@@ -130,7 +130,8 @@ In the arithmetic expressions, variables indexed with another one can be used.
 Example: %W0[%W4] => if %W4 equals 23 it corresponds to %W23 !
 
 
-ClassicLadder can run in real-time with RTLinux, RTAI or Xenomai (optional). See below.
+In this LinuxCNC tree, ClassicLadder runs through the POSIX uspace realtime
+backend selected by LinuxCNC.
 
 
 REQUIREMENTS...
@@ -170,59 +171,14 @@ http://www.sourceforge.net/projects/jamod
 http://www.modicon.com/techpubs/toc7.html
 
 
-REAL-TIME SUPPORT WITH XENOMAI (IN USER-SPACE)...
--------------------------------------------------
-Added in v0.7.92, september 2006.
-See http://www.xenomai.org
-xeno-config command must be in your path.
-Uncomment the corresponding line in the Makefile.
-Then type "make clean;make" to compile the project.
-With a "./classicladder" you will launch the real-time version !!!
-Xenomai rules! And is advised instead of a RTLinux/RTAI kernel module version.
-To have real-time in user-land is really easier than with the module, the future
-is here, and now !!!
+LINUXCNC REALTIME SUPPORT...
+----------------------------
+ClassicLadder realtime execution is built and loaded by LinuxCNC like the
+other HAL components. Configure LinuxCNC with:
 
+./configure --with-realtime=uspace
 
-REAL-TIME SUPPORT WITH RTLINUX...
----------------------------------
-To have RTLinux v3 installed before is required (see http://www.rtlinux.org)
-Be sure that the hello example works after RTLinux installation (perhaps
-you will have to type dmesg to verify if the hello texts was correctly displayed).
-With this version, the refresh of the rungs is done in real-time.
-Verify the symbolic link (or real directory depending how you've installed)
-"/usr/rtlinux" pointing on the rtlinux directory, exists.
-Here, I've done the following :
-cd /usr
-ln -sf /usr/src/your-rtlinux+linux-dir/rtlinux-3.1 rtlinux
-
-
-In a console, type the following to recompile and run :
-make clean;make rtl_support
-su
-./run_rt
-
-run_rt script accepts two optional arguments : first for the name of project to load,
-second for a config file with sizes to alloc at startup.
-
-I've tested here the real-time version with RTLinux v3.2pre3 and Linux kernel v2.4.20
-compiled with gcc v3.2
-
-
-REAL-TIME SUPPORT WITH RTAI...
-------------------------------
-Verify the symbolic link (or real directory depending how you've installed)
-"/usr/src/rtai" pointing on the rtai directory, exists.
-Here, I've done the following :
-ln -sf /usr/src/your-rtai  /usr/src/rtai
-
-In a console, type the following to recompile and run :
-make clean
-make rtai_support
-su
-./run_rt
-
-run_rt script accepts two optional arguments : first for the name of project to load,
-second for a config file with sizes to alloc at startup.
+Then build and run it through the normal LinuxCNC or halrun entrypoints.
 
 Tested with 2.4.22 kernel patched with ADEOS and compiled with gcc-3.2 running
 on a Debian (Sid) system.
@@ -248,7 +204,7 @@ to map.
 For example : I5 mapped with 4 channels means that I5, I6, I7 and I8
 are affected to an hardware channel. So be carrefull not to overlap.
 
-Comedi or direct access can works with Linux version or RTLinux version.
+Comedi or direct access can work with the Linux version.
 For direct access under Linux, the application must be launched as
 root, as it used the ioperm( ) functions.
 
@@ -347,4 +303,3 @@ KNOWN LIMITATIONS /  BUGS...
 FUTURE / TO DO LIST...
 ----------------------
 see file TODO.txt
-

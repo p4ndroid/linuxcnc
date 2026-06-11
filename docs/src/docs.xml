@@ -10,8 +10,6 @@
 <doc name="common_Getting_EMC" title="Getting LinuxCNC"/>
 <doc name="common_Updating_EMC" title="Updating LinuxCNC"/>
 <doc name="quickstart_stepper_quickstart" title="Stepper Quickstart"/>
-<doc name="config_stepconf" title="Configuration Wizard for Stepper-Based Machines"/>
-<doc name="config_pncconf" title="Point and Click Configuration Wizard (for Machines using Mesa)"/>
 <doc name="config_copy_and_run" title="Copy and Run"/>
 <doc name="common_Linux_FAQ" title="Linux FAQ"/>
 <doc name="common_GPLD_Copyright" title="Copyright and Documentation License"/>
@@ -21,9 +19,7 @@
 <doc name="common_user-intro" title="Introduction"/>
 <doc name="common_user-concepts" title="Important User Concepts"/>
 <doc name="gui_axis" title="GUI: Axis"/>
-<doc name="gui_touchy" title="GUI: Touchy"/>
 <doc name="gui_ngcgui" title="GUI: NGCGUI"/>
-<doc name="gui_tklinuxcnc" title="GUI: TkLinuxCNC"/>
 <doc name="gui_mini" title="GUI: Mini"/>
 <doc name="common_machining_center" title="Machining Center Info"/>
 <doc name="gcode_overview" title="G-code Overview"/>
@@ -32,7 +28,6 @@
 <doc name="gcode_main" title="The LinuxCNC G-code Language"/>
 <doc name="gcode_mill_canned" title="G-code Mill Canned Cycle Examples"/>
 <doc name="lathe_lathe-user" title="Lathe User Information"/>
-<doc name="plasma_qtplasmac" title="GUI: QtPlasmaC"/>
 <doc name="plasma_plasma-cnc-primer" title="Plasma CNC Primer"/>
 <doc name="gcode_rs274ngc" title="RS-274/NGC G-code"/>
 <doc name="examples_gcode" title="G-code Examples"/>
@@ -72,19 +67,6 @@
 <doc name="config_lathe-config" title="Lathe Configuration"/>
 <doc name="config_core-components" title="LinuxCNC interface to HAL"/>
 <doc name="config_stepper" title="Stepper Configuration"/>
-<doc name="hal_pyvcp" title="Python Virtual Control Panels (pyVCP)"/>
-<doc name="hal_pyvcp-examples" title="pyVCP Examples"/>
-<doc name="gui_gladevcp" title="Glade Virtual Control Panel"/>
-<doc name="gui_gladevcp-panels" title="Glade Builtin Control Panel"/>
-<doc name="gui_gscreen" title="Gscreen"/>
-<doc name="gui_qtvcp" title="QTvcp"/>
-<doc name="gui_qtvcp-vcp-panels" title="QTvcp VCP Panels"/>
-<doc name="gui_qtvcp-widgets" title="QTvcp Widgets"/>
-<doc name="gui_qtvcp-libraries" title="QTvcp Libraries"/>
-<doc name="gui_qtvcp-vismach" title="QTvcp Vismach"/>
-<doc name="gui_qtvcp-custom-widgets" title="QTvcp Custom Widgets"/>
-<doc name="gui_qtvcp-code-snippets" title="QTvcp Code Snippets"/>
-<doc name="gui_qtvcp-development" title="QTvcp Development"/>
 <doc name="motion_kinematics" title="Kinematics"/>
 <doc name="motion_tweaking_steppers" title="Tweaking Steppers"/>
 <doc name="motion_pid_theory" title="PID theory"/>

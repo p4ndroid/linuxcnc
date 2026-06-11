@@ -11,8 +11,7 @@ exec $LINUXCNC_EMCSH "$0" "$@"
 #
 #  Copyright (c) 2009 All rights reserved.
 ###############################################################
-# This is plot processes for tkemc popup under the view menu 
-# of tkemc.  The fixed size of the canvas viewing area is 500x250 
+# This is a standalone Tcl backplot helper. The fixed size of the canvas viewing area is 500x250
 # pixels less scrollbars.  The full canvas could be much larger.
 # Several local variables may be set below to match machines.
 ###############################################################

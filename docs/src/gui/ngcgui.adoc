@@ -17,13 +17,8 @@ image::images/ngcgui.png[align="center"]
   subroutines into one file for a complete part program.
 * 'NGCGUI' can run as a standalone application or can be embedded in
   multiple tab pages in the AXIS GUI.
-* 'PyNGCGUI' is an alternate, Python implementation of NGCGUI.
-* 'PyNGCGUI' can run as a standalone application or can be embedded as
-  a tab page (with its own set of multiple subroutine tabs) in any
-  GUI that supports embedding of GladeVCP applications AXIS, Touchy, Gscreen
-  and GMOCCAPY.
 
-Using NGCGUI or PyNGCGUI:
+Using NGCGUI:
 
 * Tab pages are provided for each subroutine specified in the INI file.
 * New subroutines tab pages can be added on the fly using the
@@ -38,26 +33,16 @@ Using NGCGUI or PyNGCGUI:
   for tagging variables can be used. (The gcmc executable must be installed
   separately, see: https://www.vagrearg.org/content/gcmc)
 
-[NOTE]
-====
-NGCGUI and PyNGCGUI implement the same functions and both process .ngc and .gcmc
-files that conform to a few NGCGUI-specific conventions.  In this document,
-the term 'NGCGUI' generally refers to either application.
-====
-
 == Demonstration Configurations
 
 A number of demonstration configurations are located in the sim directory
 of the Sample Configurations offered by the LinuxCNC configuration picker. The
 configuration picker is on the system's main menu: Applications > CNC > LinuxCNC
 
-Examples are included for the AXIS, Touchy, gscreen, and GMOCCAPY.
-These examples demonstrate both 3-axis (XYZ) cartesian configurations
-(like mills) and lathe (XZ) setups.  Some examples show the use of a
-pop up keyboard for touch screen systems and other examples demonstrate
-the use of files created for the gcmc (G-code Meta Compiler) application.
-The touchy examples also demonstrate incorporation of a GladeVCP back plot
-viewer (gremlin_view).
+Examples are included for AXIS. These examples demonstrate both 3-axis (XYZ)
+cartesian configurations (like mills) and lathe (XZ) setups. Some examples
+demonstrate the use of files created for the gcmc (G-code Meta Compiler)
+application.
 
 The simplest application is found as:
 
@@ -66,10 +51,6 @@ The simplest application is found as:
 A comprehensive example showing gcmc compatibility is at:
 
   Sample Configurations/sim/axis/ngcgui/ngcgui_gcmc
-
-A comprehensive example embedded as a GladeVCP app and using gcmc is at:
-
-  Sample Configurations/sim/gscreen/ngcgui/pyngcgui_gcmc
 
 The example sim configurations make use of library files that provide
 example G-code subroutine (.ngc) files and G-code-meta-compiler (.gcmc) files:
@@ -254,48 +235,6 @@ can be invoked multiple times.  Multiple standalone NGCGUI applications
 can be started independently.
 ====
 
-=== Standalone PyNGCGUI
-
-For usage, type in a terminal:
-
-----
-pyngcgui --help
-Usage:
-pyngcgui [Options] [<sub_filename>]
-Options requiring values:
-    [-d | --demo] [0|1|2] (0: DEMO standalone toplevel)
-                          (1: DEMO embed new notebook)
-                          (2: DEMO embed within existing notebook)
-    [-S | --subfile       <sub file name>]
-    [-p | --preamble      <preamble file name>]
-    [-P | --postamble     <postamble file name>]
-    [-i | --ini           <INI file name>]
-    [-a | --autofile      <auto file name>]
-    [-t | --test          <testno>]
-    [-K | --keyboardfile  <glade_file>] (use custom popupkeyboard glade file)
-Solo Options:
-    [-v | --verbose]
-    [-D | --debug]
-    [-N | --nom2]         (no m2 terminator (use %))
-    [-n | --noauto]       (save but do not automatically send result)
-    [-k | --keyboard]     (use default popupkeybaord)
-    [-s | --sendtoaxis]   (send generated NGC file to AXIS GUI)
-Notes:
-      A set of files is comprised of a preamble, subfile, postamble.
-      The preamble and postamble are optional.
-      One set of files can be specified from cmdline.
-      Multiple sets of files can be specified from an INI file.
-      If --ini is NOT specified:
-         search for a running LinuxCNC and use its INI file.
-----
-
-[NOTE]
-====
-As a standalone application, PyNGCGUI can read an INI file (or a
-running LinuxCNC application) to create tab pages for multiple
-subfiles.
-====
-
 == Embedding NGCGUI
 
 === Embedding NGCGUI in AXIS
@@ -329,37 +268,11 @@ that uses the application truetype-tracer.  The truetype-tracer application must
 be installed independently and located in the user PATH.
 ====
 
-=== Embedding PyNGCGUI as a GladeVCP tab page in a GUI
-
-The following INI file items go in the [DISPLAY] section for use with the
-AXIS, Gscreen, or Touchy GUIs.  (See additional sections below for additional
-items needed)
-
-.EMBED_ Items
-* `EMBED_TAB_NAME = PyNGCGUI` - name to appear on embedded tab
-* `EMBED_TAB_COMMAND = gladevcp -x {XID} pyngcgui_axis.ui` - invokes GladeVCP
-* `EMBED_TAB_LOCATION = name_of_location` - where the embedded page is located
-
-[NOTE]
-====
-The EMBED_TAB_LOCATION specifier is not used for the AXIS GUI.  While
-PyNGCGUI can be embedded in AXIS, integration is more complete when using
-NGCGUI (using TKPKG = Ngcgui 1.0).  To specify the EMBED_TAB_LOCATION
-for other GUIs, see the <<sub:ini:sec:display,DISPLAY Section>> of the INI
-Configuration Chapter.
-====
-
-[NOTE]
-====
-The truetype tracer GUI front-end is not currently available for GladeVCP
-applications.
-====
-
 [[ngcgui-ini]]
-=== Additional INI File items required for NCGUI or PyNGCGUI
+=== Additional INI File items required for NGCGUI
 
-The following INI file items go in the [DISPLAY] section for any GUI
-that embeds either NGCGUI or PyNGCGUI.
+The following INI file items go in the [DISPLAY] section for AXIS
+configurations that embed NGCGUI.
 
 * 'NGCGUI_FONT = Helvetica -12 normal' - specifies the font name,size, normal|bold
 * 'NGCGUI_PREAMBLE = in_std.ngc' - the preamble file to be added in front of the
@@ -559,20 +472,6 @@ Files not intended for use as subfiles can include a special comment: "(not_a_su
 [RS274NGC]USER_M_PATH = dirname1:dirname2:dirname3 ...::
   _Example_: `[RS274NGC]USER_M_PATH = ../../nc_files/ngcgui_lib/mfiles` +
   _Note_:    Optional, needed to locate custom user M-files.
-
-[DISPLAY]EMBED_TAB_NAME = name to display on embedded tab page::
-  _Example_: `[DISPLAY]EMBED_TAB_NAME = Pyngcgui` +
-  _Note_:    The entries: `EMBED_TAB_NAME`, `EMBED_TAB_COMMAND`, `EMBED_TAB_LOCATION`
-             define an embedded application for several LinuxCNC GUIs.
-
-[DISPLAY]EMBED_TAB_COMMAND = programname followed by arguments::
-  _Example_: `[DISPLAY]EMBED_TAB_COMMAND = gladevcp -x {XID} pyngcgui_axis.ui` +
-  _Note_:    For GladeVCP applications, see the <<cha:glade-vcp,GladeVCP Chapter>>.
-
-[DISPLAY]EMBED_TAB_LOCATION = name_of_location::
-  _Example_: `[DISPLAY]EMBED_TAB_LOCATION = notebook_main` +
-  _Note_:    See example INI files for possible locations. +
-             Not required for the AXIS GUI.
 
 [DISPLAY]PROGRAM_PREFIX = dirname::
   _Example_: `[DISPLAY]PROGRAM_PREFIX = ../../nc_files` +

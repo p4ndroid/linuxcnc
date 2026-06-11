@@ -22,11 +22,6 @@
 
 #ifdef MODULE
 #include <linux/string.h>
-#ifdef RTAI
-#include <linux/kernel.h>
-#include <linux/module.h>
-#include "rtai.h"
-#endif
 #else
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,7 +43,7 @@ char * ErrorDesc;
 char * VerifyErrorDesc;
 int UnderVerify;
 
-/* for RTLinux module */
+/* for module builds */
 #if defined( MODULE )
 int atoi(const char *p)
 {
@@ -709,4 +704,3 @@ char * VerifySyntaxForMakeCalc(char * StringToVerify)
 	UnderVerify = FALSE;
 	return VerifyErrorDesc;
 }
-

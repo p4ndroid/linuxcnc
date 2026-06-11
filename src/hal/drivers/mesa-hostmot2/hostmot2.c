@@ -34,7 +34,7 @@
 
 
 
-MODULE_INFO(linuxcnc, "component:hostmot2:RTAI driver for the HostMot2 firmware from Mesa Electronics.");
+MODULE_INFO(linuxcnc, "component:hostmot2:Driver for the HostMot2 firmware from Mesa Electronics.");
 MODULE_INFO(linuxcnc, "funct:read:1:Read all registers.");
 MODULE_INFO(linuxcnc, "funct:write:1:Write all registers, and pet the watchdog to keep it from biting.");
 MODULE_INFO(linuxcnc, "license:GPL");
@@ -1849,4 +1849,3 @@ void hm2_force_write(hostmot2_t *hm2) {
     if (hm2->llio->set_force_enqueue != NULL)
         hm2->llio->set_force_enqueue(hm2->llio, 0);
 }
-

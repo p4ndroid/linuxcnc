@@ -309,13 +309,6 @@ Files: tests/trajectory-planner/circular-arcs/octave/make_peak_img.m
 Copyright: 2014 Robert W. Ellenberg <rob@carbidelabs.com>
 License: GPL-3+
 
-Files: share/qtvcp/images/qtplasmac/numpad.svg
-       share/qtvcp/images/qtplasmac/keyboard.svg
-Copyright: 2013,2016 Francesco Fumanti <francesco.fumanti@gmx.net>
-           2011-2014 marmuta <marmvta@gmail.com>
-           Onboard Devel Team
-License: GPL-3+
-
 Files: src/m4/ax_boost_python.m4
 Copyright: 2008 Michael Tindal
            2013 Daniel Müllner <daniel@danifold.net>
@@ -353,13 +346,6 @@ Comment: The origin of this subtree is the Classic Ladder Project
  https://www.sourceforge.net/projects/classicladder
 
 
-Files: share/qtvcp/screens/woodpecker/images/QTvcp?Widgets_files/asciidoc.js
-Copyright:      2002 Mihai Bazon
- modified by
-                2006 Troy D. Hanson
-           2006,2009 Stuart Rackham
-License: GPL-2
-
 Files: src/libnml/*
        src/libnml/linklist/*
        src/libnml/posemath/*
@@ -382,34 +368,15 @@ Copyright: The LinuxCNC developers derived this work from
            2004 Fred Proctor & Will Shackleford
 License: GPL-2
 
-Files: 
- lib/python/gladevcp/iconview.py
-Copyright: 2012 Norbert Schechner <nieson@web.de>
-Comment: based on a tutorial from ZetCode PyGTK tutorial
- the original code is under the BSD license
- by jan bodnar on zetcode.com 
-License: GPL-2
-
 Files:
  lib/python/rs274/OpenGLTk.py
 Copyright:      Mike Hartshorn
                 Department of Chemistry, University of York, UK
 License: BSD-3-Clause
 
-Files:
- lib/python/qtvcp/widgets/stylesheeteditor.py
- lib/python/qtvcp/widgets/nurbs_editor.py
-Copyright: 2010 Hans-Peter Jansen <hpj@urpla.net>.
-                Nokia Corporation and/or its subsidiary(-ies).
-License: BSD-3-Clause
-
 Files: src/rtapi/*
 Copyright: the LinuxCNC developers
 License: LGPL-2.1+
-
-Files: share/qtvcp/images/widgets/writer/icons/*
-Copyright: 2013 Yusuke Kamiyamane
-License: CC-BY-3.0
 
 Files: docs/src/admon-*.svg
 Copyright: 2019-2024 The Bootstrap Authors

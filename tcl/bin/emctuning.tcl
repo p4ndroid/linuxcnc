@@ -18,8 +18,7 @@ eval emc_init $argv
 ###############################################################
 # emctuning.tcl
 # EMC system identification and autotuning program
-# Needs emcsh to run-- this is sourced by tkemc, but it can be run
-# standalone. Make sure directory containing emcsh is in your path,
+# Needs emcsh to run. Make sure directory containing emcsh is in your path,
 # or edit the exec line above with the path to emcsh.
 
 # check if any emc commands exist, and quit if not
@@ -27,8 +26,7 @@ if {! [string length [info commands emc_plat]]} {
     error "emctuning needs to run from \"emcsh\""
 }
 
-# set cycle time for updating, using tkemc's displayCycleTime if
-# present or our own if not
+# set cycle time for updating
 if {! [info exists displayCycleTime]} {
     set displayCycleTime 100
 }
@@ -219,7 +217,4 @@ proc popupTuning {{w .logwindow}} {
     bind $w <Return> "popdownTuning $w"
 }
 
-# if we're not running inside tkemc, then pop us up in root window
-if {! [info exists tkemc]} {
-    popupTuning .
-}
+popupTuning .

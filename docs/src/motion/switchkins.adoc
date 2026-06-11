@@ -340,8 +340,7 @@ kinstype==2.
 
 The user custom kinematics file can be compiled from out-of-tree
 source locations for rt-preempt implementations or by replacing
-the in-tree template file (src/emc/kinematics/userkfuncs.c) for rtai
-systems.
+the in-tree template file (src/emc/kinematics/userkfuncs.c).
 
 Preempt-rt make example:
 

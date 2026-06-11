@@ -25,14 +25,8 @@
 #include "classicladder_gtk.h"
 #endif
 
-#if defined(MODULE) && defined(RTAI)
-#include <linux/kernel.h>
-#include <linux/module.h>
-#include "rtai.h"
-#else
 #include <stdio.h>
 #include <stdlib.h>
-#endif
 #include "classicladder.h"
 #include "global.h"
 
@@ -223,7 +217,6 @@ void WriteVar(int TypeVar,int NumVar,int Value)
 		case VAR_PHYS_INPUT:
 		case VAR_PHYS_OUTPUT:
 // with a thread for all versions, do no more call a gtk function from this thread !
-//////			// for Xenomai, do not do it now to avoid a domain mode switch !
 //////if defined( GTK_INTERFACE ) && !defined( __XENO__ )
 //////			RefreshOneBoolVar( TypeVar, NumVar, Value );
 //////else
@@ -245,4 +238,3 @@ void DumpVars(void)
 void DoneVars(void) {}
 void CycleStart(void) {}
 void CycleEnd(void) {}
-

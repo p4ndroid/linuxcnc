@@ -113,15 +113,13 @@ DEPFOUND=true
 
 ##############################################################################
 # Section 2                                                                  #
-# RealTime checking (either RTAI, or RT-Linux)                               #
+# RealTime checking (POSIX uspace only)                                      #
 # Subsection 2.1 - arguments to ./configure (--with-realtime)                #
-# Subsection 2.2 - if none specified above, RTDIR needs to be found by search#
-# Subsection 2.3 - RTS(RT-script) is found, it gets queried for values       #
+# Subsection 2.2 - fixed values for the POSIX userspace backend              #
 ##############################################################################
 
 # set up some default values
 RTDIR=""
-RTAI=""
 RTPREFIX=""
 KERNELDIR=""
 RTFLAGS=""
@@ -149,16 +147,21 @@ AC_ARG_ENABLE(simulator,
 
 AC_ARG_WITH(realtime,
     AS_HELP_STRING(
-        [--with-realtime=PATH],
-        [Path where RTAI is installed, or "uspace" for POSIX userspace.]
+        [--with-realtime=uspace],
+        [Select the POSIX userspace realtime backend.]
     ),
     [   case "$withval" in
 	"" | y | ye | yes | n | no)
-	    AC_MSG_ERROR([You must supply a path or "uspace" for --with-realtime.]) ;;
-	*)
+	    AC_MSG_ERROR([You must supply "uspace" for --with-realtime.]) ;;
+	uspace)
             RTS="$withval" ;;
+	*)
+	    AC_MSG_ERROR([Only --with-realtime=uspace is supported.]) ;;
         esac
         ])
+if test -z "$RTS"; then
+  RTS=uspace
+fi
 AC_SUBST([RTS])
 
 TOOL_NML=no
@@ -176,196 +179,64 @@ AC_ARG_ENABLE(toolnml,
         esac
     ])
 ##############################################################################
-# Subsection 2.2                                                             #
-# 1. If a RT has been specified by the user it needs to be checked for       #
-# validity. That is done by checking default locations for a certain script  #
-# (similar to 2)                                                             #
-#                                                                            #
-# 2. If no RT has been specified explicitly by the user, one has to be       #
-# found by search. In order to do that the following code will search for a  #
-# RT-specific script:                                                        #
-# rtai-config for RTAI 3.x                                                   #
-##############################################################################
-
-#at this point if RTS is empty, we need to find RT ourselves
-AC_MSG_CHECKING([for rtai-config])
-if test -z "$RTS" || test "$RTS" = uspace; then
-  DIRS="/usr/realtime-`uname -r` /usr/realtime /usr/realtime* /usr /usr/src/rtai*"
-else
-  DIRS="$RTS"
-fi
-RTAI_CONFIG=none
-for location in $DIRS; do
-  for subdir in . scripts bin; do
-    for signature in rtai; do
-      candidate=$location/$subdir/$signature-config
-      if test "$RTAI_CONFIG" = "none" -a -x $candidate; then
-        RTAI_CONFIG=$candidate
-      fi
-    done
-  done
-done
-
-AC_MSG_RESULT([$RTAI_CONFIG])
-AC_SUBST([RTAI_CONFIG])
-
-AC_PATH_PROG([XENOMAI_CONFIG], [xeno-config], [none])
-AC_SUBST([XENOMAI_CONFIG])
-
-#Xenomai evl
-HAS_EVL=n
-AC_CHECK_HEADER([evl/evl.h],[
-  HAS_EVL=y
-])
-
 AC_MSG_CHECKING([for realtime API(s) to use])
-if test "$RTS" = uspace || test -z "$RTS" -a "$RTAI_CONFIG" = "none" ; then
-  RTS=uspace
-  if test "$RTAI_CONFIG" = "none" ; then
-    USPACE_RTAI=
-    CONFIG_USPACE_RTAI=n
-    RTAI_LXRT_CFLAGS=
-    RTAI_LXRT_LDFLAGS=
+AC_MSG_RESULT([uspace])
+
+AC_MSG_CHECKING([whether to enable userspace PCI access])
+AC_ARG_ENABLE(userspace-pci,
+    AS_HELP_STRING(
+      [--disable-userspace-pci],
+      [Disable userspace PCI access (use this if libudev is unavailable).],
+    ),
+    [
+      case "$enableval" in
+      (Y*|y*)
+          BUILD_UDEV=yes ;;
+      (*)
+          BUILD_UDEV=no ;;
+      esac
+    ],
+    [
+      case "`uname -s`" in
+      (*BSD*) BUILD_UDEV=no ;;
+      (*) BUILD_UDEV=yes ;;
+      esac
+    ])
+AC_MSG_RESULT([$BUILD_UDEV])
+AC_SUBST([BUILD_UDEV])
+
+if test "$BUILD_UDEV" = "yes"; then
+  AC_MSG_CHECKING([for libudev])
+  if pkg-config libudev >/dev/null 2>&1; then
+      LIBUDEV_VER=`pkg-config udev --modversion`
+      AC_MSG_RESULT(yes - version [$LIBUDEV_VER])
+      LIBUDEV_CFLAGS=`pkg-config libudev --cflags`
+      LIBUDEV_LIBS=`pkg-config libudev --libs`
   else
-    USPACE_RTAI=+lxrt
-    CONFIG_USPACE_RTAI=y
-    RTAI_LXRT_CFLAGS=`$RTAI_CONFIG --lxrt-cflags`
-    RTAI_LXRT_LDFLAGS=`$RTAI_CONFIG --lxrt-ldflags`
-    AC_DEFINE([USPACE_RTAI], [], [Define if uspace realtime should optionally support RTAI LXRT])
+    AC_MSG_ERROR([libudev-dev not found])
   fi
-  AC_SUBST([CONFIG_USPACE_RTAI])
-  AC_SUBST([RTAI_LXRT_CFLAGS])
-  AC_SUBST([RTAI_LXRT_LDFLAGS])
-
-  if test "$XENOMAI_CONFIG" = "none" ; then
-    USPACE_XENOMAI=
-    CONFIG_USPACE_XENOMAI=n
-    XENOMAI_CFLAGS=
-    XENOMAI_LDFLAGS=
-  else
-    USPACE_XENOMAI=+xenomai
-    CONFIG_USPACE_XENOMAI=y
-    XENOMAI_CFLAGS=`$XENOMAI_CONFIG --skin posix --cflags`
-    XENOMAI_LDFLAGS=`$XENOMAI_CONFIG --skin posix --ldflags`
-    AC_DEFINE([USPACE_XENOMAI], [], [Define if uspace realtime should optionally support Xenomai])
-  fi
-
-  AC_SUBST([CONFIG_USPACE_XENOMAI])
-  AC_SUBST([XENOMAI_CFLAGS])
-  AC_SUBST([XENOMAI_LDFLAGS])
-
-  if test "$HAS_EVL" = "n" ; then
-    USPACE_XENOMAI_EVL=
-    CONFIG_USPACE_XENOMAI_EVL=n
-    XENOMAI_EVL_CFLAGS=
-    XENOMAI_EVL_LDFLAGS=
-  else
-    USPACE_XENOMAI_EVL=+xenomai4
-    CONFIG_USPACE_XENOMAI_EVL=y
-    XENOMAI_EVL_CFLAGS=
-    XENOMAI_EVL_LDFLAGS=-levl
-    AC_DEFINE([USPACE_XENOMAI_EVL], [], [Define if uspace realtime should optionally support Xenomai-evl])
-  fi
-
-  AC_SUBST([CONFIG_USPACE_XENOMAI_EVL])
-  AC_SUBST([XENOMAI_EVL_CFLAGS])
-  AC_SUBST([XENOMAI_EVL_LDFLAGS])
-
-  AC_MSG_RESULT([$RTS$USPACE_RTAI$USPACE_XENOMAI$USPACE_XENOMAI_EVL])
-
-  AC_MSG_CHECKING([whether to enable userspace PCI access])
-  AC_ARG_ENABLE(userspace-pci,
-      AS_HELP_STRING(
-        [--disable-userspace-pci],
-        [Disable userspace PCI access (use this if libudev is unavailable).],
-      ),
-      [
-	case "$enableval" in
-	(Y*|y*)
-	    BUILD_UDEV=yes ;;
-	(*)
-	    BUILD_UDEV=no ;;
-	esac
-      ],
-      [
-        case "`uname -s`" in
-        (*BSD*) BUILD_UDEV=no ;;
-        (*) BUILD_UDEV=yes ;;
-        esac
-      ])
-  AC_MSG_RESULT([$BUILD_UDEV])
-  AC_SUBST([BUILD_UDEV])
-
-  if test "$BUILD_UDEV" = "yes"; then
-    AC_MSG_CHECKING([for libudev])
-    if pkg-config libudev >/dev/null 2>&1; then
-        LIBUDEV_VER=`pkg-config udev --modversion`
-        AC_MSG_RESULT(yes - version [$LIBUDEV_VER])
-        LIBUDEV_CFLAGS=`pkg-config libudev --cflags`
-        LIBUDEV_LIBS=`pkg-config libudev --libs`
-    else
-      AC_MSG_ERROR([libudev-dev not found])
-    fi
-  else
-    LIBUDEV_CFLAGS=-DNO_LIBUDEV
-  fi
-  AC_SUBST([LIBUDEV_CFLAGS])
-  AC_SUBST([LIBUDEV_LIBS])
 else
-  RTS="$RTAI_CONFIG"
-  AC_MSG_RESULT([$RTS])
+  LIBUDEV_CFLAGS=-DNO_LIBUDEV
 fi
+AC_SUBST([LIBUDEV_CFLAGS])
+AC_SUBST([LIBUDEV_LIBS])
 
 
 ##############################################################################
-# Subsection 2.3                                                             #
-# we have the RT-script now, it's time to query it for some values           #
-# it can provide us with default values such as CC, CFLAGS, etc              #
-# see each case for more details                                             #
+# Subsection 2.2                                                             #
+# Set fixed values for the POSIX userspace realtime backend.                 #
 ##############################################################################
 
 RTARCH=`uname -m | sed s/i.86/i386/`
-case $RTS in
-*/rtai-config)
-    RTPREFIX=rtai
-    RTAI_VERSION=$($RTS --version)
-    RTAI=$(echo $RTAI_VERSION | cut -f 1 -d .)
-    RTDIR=`$RTS --prefix`
-    RTDIR=$(cd $RTDIR ; pwd -P )
-    RTFLAGS=`$RTS --module-cflags`
-    RTFLAGS="$RTFLAGS -DRTAI=$RTAI"
-    KERNELDIR=`$RTS --linux-dir`
-    RTARCH=`$RTS --arch`
-    ULAPI_CFLAGS=`$RTS --lxrt-cflags`
-    ULAPI_LDFLAGS=`$RTS --lxrt-ldflags`
-;;
-uspace|uspace+*)
-    RTPREFIX=uspace
-    RTDIR=$(pwd -P)
-    ULAPI_CFLAGS=""
-    RTFLAGS="-DUSPACE"
-    BUILD_SYS=uspace
-    MODEXT=.so
-    MODULE_DIR=${prefix}/lib/linuxcnc/modules
-    ULAPI_LDFLAGS=""
-esac
+RTPREFIX=uspace
+RTDIR=$(pwd -P)
+ULAPI_CFLAGS=""
+RTFLAGS="-DUSPACE"
+BUILD_SYS=uspace
+MODEXT=.so
+MODULE_DIR=${prefix}/lib/linuxcnc/modules
+ULAPI_LDFLAGS=""
 
-if test "$RTS" != uspace; then
-    AC_MSG_CHECKING([for location of kernel headers])
-    AC_ARG_WITH(kernel-headers,
-        AS_HELP_STRING(
-            [--with-kernel-headers=PATH],
-            [Location for kernel headers.]
-        ),
-	[
-	    KERNELDIR="$withval"
-	    AC_MSG_RESULT(using specified value: $KERNELDIR)
-	],[
-	    AC_MSG_RESULT(using value from RTS: $KERNELDIR)
-	])
-fi
-
-AC_SUBST([RTAI])
 AC_SUBST([RTPREFIX])
 AC_SUBST([KERNELDIR])
 AC_SUBST([RTFLAGS])
@@ -374,12 +245,7 @@ AC_SUBST([RTARCH])
 AC_SUBST([ULAPI_CFLAGS])
 AC_SUBST([ULAPI_LDFLAGS])
 
-case "$RTPREFIX" in
-uspace)
-    AC_DEFINE(RTAPI_USPACE, [], [Realtime system is userspace]) ;;
-rtai)
-    AC_DEFINE(RTAPI_RTAI, [], [Realtime system is RTAI]) ;;
-esac
+AC_DEFINE(RTAPI_USPACE, [], [Realtime system is userspace])
 
 
 EMC2_HOME=`(cd .. ; pwd)`
@@ -392,23 +258,17 @@ AC_DEFINE_UNQUOTED([RTDIR], "$RTDIR", [Directory of the installed realtime syste
 # additional checking                                                        #
 # Subsection 3.1 - checking for a CC (we must use the same one used for RT)  #
 # Subsection 3.2 - check for the kernel version, with RT patches             #
-# Subsection 3.3 - check the moduledir where modules can get installed       #
+# Subsection 3.3 - check the module dir where uspace modules get installed   #
 # Subsection 3.4 - check for GTK                                             #
 # Subsection 3.5 - check for utility programs needed to build and run EMC    #
 ##############################################################################
 
 
 ##############################################################################
-# Subsection 3.1 - checking for a CC (we must use the same one used for RT)  #
+# Subsection 3.1 - checking for a CC                                         #
 ##############################################################################
 AC_MSG_CHECKING([for cc version])
-
-if (test ${RTS##*/} = rtai-config ) ; then
-  RTSCC=`$RTS --cc`
-  AC_MSG_RESULT(found $RTSCC in rtai-config)
-else
-  AC_MSG_RESULT(not specified)
-fi
+AC_MSG_RESULT(not specified)
 
 AC_PROG_CC([$RTSCC gcc clang])
 AC_PROG_CPP()
@@ -622,12 +482,9 @@ AC_SUBST([EXT_RTFLAGS])
 # Subsection 3.3 - check the moduledir where modules can get installed       #
 #                                                                            #
 # Provides the user the possibility to specify (--with-module-dir=<path>)    #
-# If not specified default inside /lib/modules/${KERNEL_VERS}/               #
-# to the location where a RT-module gets found (mbuff.o or rtai_shed.o)     #
-# (maybe the default should be /lib/modules/$KERNEL_VERS/extra if it exists? #
+# If not specified, default to the LinuxCNC module directory under prefix.    #
 ##############################################################################
 
-# Create a module-dir option, similar to rtai's...
 AC_MSG_CHECKING([for module installation directory])
 
 AC_ARG_WITH(module-dir,
@@ -644,15 +501,6 @@ AC_ARG_WITH(module-dir,
         MODULE_DIR="$withval"
     ])
 
-
-# if not specified, ask the realtime config script where the directory is
-# if the config script returns an error, set MODULE_DIR to nothing
-if test "x" = "x$MODULE_DIR" ; then
-  MODULE_DIR=`$RTS --module-dir 2>/dev/null`
-  if ! test -d $MODULE_DIR ; then
-    AC_MSG_ERROR([$RTS --module-dir did not specify an existing directory.  You must use specify it using --with-module-dir=...])
-  fi
-fi
 
 if test "$RUN_IN_PLACE" = "yes"; then
     RIP_MODULE_DIR="${BUILD_TOPLEVEL}/rtlib"
@@ -773,9 +621,7 @@ AC_SUBST([EMC2_ICON])
 AC_SUBST([HALLIB_DIR])
 
 # coordinate installed auxiliary applications (not RIP or deb dependent):
-LINUXCNC_AUX_GLADEVCP=/usr/share/linuxcnc/aux_gladevcp
 LINUXCNC_AUX_EXAMPLES=/usr/share/linuxcnc/aux_examples
-AC_SUBST([LINUXCNC_AUX_GLADEVCP])
 AC_SUBST([LINUXCNC_AUX_EXAMPLES])
 
 # define temporary directory
@@ -879,27 +725,6 @@ then
     AC_MSG_ERROR([awk not found])
 fi
 
-if test "$RTS" != uspace; then
-    # Module utilities not needed for uspace
-    AC_PATH_PROG(INSMOD, insmod, "none", $SPATH)
-    if test $INSMOD = "none"
-    then
-        AC_MSG_ERROR([insmod not found])
-    fi
-
-    AC_PATH_PROG(RMMOD, rmmod, "none", $SPATH)
-    if test $RMMOD = "none"
-    then
-        AC_MSG_ERROR([rmmod not found])
-    fi
-
-    AC_PATH_PROG(LSMOD, lsmod, "none", $SPATH)
-    if test $LSMOD = "none"
-    then
-        AC_MSG_ERROR([lsmod not found])
-    fi
-fi
-
 AC_PATH_PROG(PIDOF, pidof, "none", $SPATH)
 if test $PIDOF = "none"
 then
@@ -933,48 +758,6 @@ if test $INTLTOOL_EXTRACT = "none"
 then
     AC_MSG_ERROR([intltool-extract not found])
 fi
-
-AC_ARG_WITH(rmmod,
-    AS_HELP_STRING(
-        [--with-rmmod=PATH],
-        [Location of the rmmod program to use.]
-    ),
-    [
-	case "$withval" in
-	"" | y | ye | yes)
-	    AC_MSG_ERROR([You must supply an argument to --with-rmmod.])
-	  ;;
-	n | no | none)
-	    RMMOD=""
-	  ;;
-	*)
-	    RMMOD="$withval"
-	esac
-    ],
-    [
-            RMMOD="$EMC2_BIN_DIR/linuxcnc_module_helper remove"
-    ])
-
-AC_ARG_WITH(insmod,
-    AS_HELP_STRING(
-        [--with-insmod=PATH],
-        [Location of the insmod program to use.]
-    ),
-    [
-	case "$withval" in
-	"" | y | ye | yes)
-	    AC_MSG_ERROR([You must supply an argument to --with-insmod.])
-	  ;;
-	n | no | none)
-	    INSMOD=""
-	  ;;
-	*)
-	    INSMOD="$withval"
-	esac
-    ],
-    [
-            INSMOD="$EMC2_BIN_DIR/linuxcnc_module_helper insert"
-    ])
 
 AC_PATH_PROGS(YAPPS, [yapps yapps2])
 if test -z "$YAPPS"; then
@@ -1260,28 +1043,6 @@ AC_SUBST(BUILD_DOCS)
 AC_SUBST(BUILD_DOCS_PDF)
 AC_SUBST(BUILD_DOCS_HTML)
 AC_SUBST(BUILD_DOCS_TRANSLATED)
-
-if test "$RTS" '!=' uspace
-then
-for m in adeos rtai_hal rtai_ksched rtai_sched rtai_fifos rtai_sem rtai_math \
-; do
-    AC_MSG_CHECKING([for $m])
-    TMP=$(find $MODULE_DIR -name $m$MODEXT 2>/dev/null)
-    if test -z "$TMP"; then
-        TMP=$(find /lib/modules/$KERNEL_VERS -name $m$MODEXT)
-    fi
-    eval MODPATH_$m=${TMP/$KERNEL_VERS/\\\$\\\(uname\\\ -r\\\)}
-    AC_MSG_RESULT([${TMP:-not found}])
-done
-
-AC_SUBST(MODPATH_adeos)
-AC_SUBST(MODPATH_rtai_hal)
-AC_SUBST(MODPATH_rtai_ksched)
-AC_SUBST(MODPATH_rtai_sched)
-AC_SUBST(MODPATH_rtai_fifos)
-AC_SUBST(MODPATH_rtai_sem)
-AC_SUBST(MODPATH_rtai_math)
-fi
 
 # Checks for header files.
 
@@ -1761,8 +1522,6 @@ AC_CONFIG_FILES(../lib/python/nf.py)
 AC_CONFIG_FILES([../scripts/linuxcncmkdesktop], [chmod +x ../scripts/linuxcncmkdesktop])
 AC_CONFIG_FILES(../share/applications/linuxcnc-latency.desktop)
 AC_CONFIG_FILES(../share/applications/linuxcnc-latency-histogram.desktop)
-AC_CONFIG_FILES(../share/applications/linuxcnc-pncconf.desktop)
-AC_CONFIG_FILES(../share/applications/linuxcnc-stepconf.desktop)
 AC_CONFIG_FILES(../share/applications/linuxcnc.desktop)
 AC_CONFIG_FILES(../share/desktop-directories/linuxcnc-cnc.directory)
 AC_CONFIG_FILES(../share/desktop-directories/linuxcnc-ref.directory)

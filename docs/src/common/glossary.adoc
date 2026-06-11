@@ -213,7 +213,9 @@ Jog::
     jog speed can be set from the graphical interface.
 
 kernel-space::
-     Code running inside the kernel, as opposed to code running in userspace.  Some realtime systems (like RTAI) run realtime code in the kernel and non-realtime code in userspace, while other realtime systems (like Preempt-RT) run both realtime and non-realtime code in userspace.
+     Code running inside the kernel, as opposed to code running in userspace.
+    In this reduced tree, LinuxCNC realtime code runs in userspace on POSIX
+    realtime scheduling.
 
 Kinematics::
      (((kinematics))) The position relationship between world
@@ -273,8 +275,7 @@ Program Units::
 
 Python::
      General-purpose, very high-level programming language. Used in LinuxCNC
-    for the Axis GUI, the StepConf configuration tool, and several G-code
-    programming scripts.
+    for the AXIS GUI and several G-code programming scripts.
 
 Rapid::
      (((rapid))) Fast, possibly less precise motion of the tool,
@@ -288,22 +289,11 @@ Rapid rate::
     testing a G-code program for the first time.
 
 Real-time::
-    (((real-time))) Software that is intended to meet very strict timing deadlines. On Linux, in order to meet these requirements it is necessary to install a realtime kernel such as RTAI or Preempt-RT, and build the LinuxCNC software to run in the special real-time environment.  Realtime software can run in the kernel or in userspace, depending on the facilities offered by the system.
-
-RTAI::
-     (((RTAI))) Real Time Application Interface, see
-    https://www.rtai.org/[https://www.rtai.org/], the real-time extensions
-    for Linux that LinuxCNC can use to achieve real-time performance.
-
-RTLINUX::
-    (((RTLINUX))) See
-    https://en.wikipedia.org/wiki/RTLinux[https://en.wikipedia.org/wiki/RTLinux],
-    an older real-time extension for Linux that LinuxCNC used to use to
-    achieve real-time performance.  Obsolete, replaced by RTAI.
+    (((real-time))) Software that is intended to meet very strict timing deadlines. On Linux, in order to meet these requirements it is necessary to install a PREEMPT_RT kernel and build LinuxCNC for the uspace realtime environment. Realtime software in this tree runs in userspace.
 
 RTAPI::
      (((RTAPI)))A portable interface to real-time operating systems
-    including RTAI and POSIX pthreads with realtime extensions.
+    using POSIX pthreads with realtime extensions.
 
 RS-274/NGC::
      (((RS274NGC))) The formal name for the language

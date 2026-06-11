@@ -4,7 +4,7 @@ exec $LINUXCNC_EMCSH "$0" "$@"
 
 ###############################################################
 # Description:  emcdebug.tcl
-#               This file sets debug levesl from tkemc.
+#               This file sets debug levels.
 #
 #  Derived from a work by Fred Proctor & Will Shackleford
 #  Author: 
@@ -14,8 +14,7 @@ exec $LINUXCNC_EMCSH "$0" "$@"
 ###############################################################
 #
 # Sets value of EMC_DEBUG, so you can turn on/off what you want dumped
-# Needs emcsh to run-- this is sourced by tkemc, but it can be run
-# standalone. Make sure directory containing emcsh is in your path,
+# Needs emcsh to run. Make sure directory containing emcsh is in your path,
 # or edit the exec line above with the path to emcsh.
 #
 ###############################################################
@@ -165,7 +164,7 @@ proc popupDebug {{w .debugwindow}} {
         set lw ""
         wm title $w [msgcat::mc "LinuxCNC Debug"]
     } else {
-	# we were sourced into tkemc, and run as a popup
+	# run as a popup
         set lw $w
         if {[winfo exists $w]} {
             wm deiconify $w
@@ -205,7 +204,4 @@ proc popupDebug {{w .debugwindow}} {
     bind $w <Return> "emc_debug [collectDebug] ; popdownDebug $w"
 }
 
-# if we're not running inside tkemc, then pop us up in root window
-if {! [info exists tkemc]} {
-    popupDebug .
-}
+popupDebug .

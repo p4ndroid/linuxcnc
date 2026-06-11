@@ -63,9 +63,6 @@ set ::default_start_node sim/axis/axis.ini
 # exclude directories that should never be offered
 set ::exclude_list [list common]
 
-# exclude files with special names
-set ::exclude_file_list _panelui.ini
-
 # support filenames that are never copied to user:
 set ::never_copy_list [list maintainer.txt nodemocopy]
 
@@ -73,9 +70,6 @@ set ::never_copy_list [list maintainer.txt nodemocopy]
 # reorder: priority low to high:
 set ::preferred_names [list \
                        low_graphics \
-                       gmoccapy \
-                       gscreen \
-                       touchy \
                        ngcgui \
                        axis \
                        by_machine \

@@ -64,14 +64,8 @@ BUILDSYS = @BUILD_SYS@
 
 KERNELDIR := @KERNELDIR@
 CC := @CC@
-RTAI = @RTAI@
 RTFLAGS = $(filter-out -ffast-math,@RTFLAGS@ @EXT_RTFLAGS@) -fno-fast-math $(call cc-option,-mieee-fp) -fno-unsafe-math-optimizations
 RTFLAGS := -O2 -Wall -Wextra -g -I. -I@RTDIR@/include $(RTFLAGS) -DRTAPI -D_GNU_SOURCE -Drealtime
-ifneq ($(KERNELRELEASE),)
-ifeq ($(RTARCH):$(RTAI):$(filter $(RTFLAGS),-msse),x86_64:3:)
-EXTRA_CFLAGS += -msse
-endif
-endif
 EXTRA_CFLAGS += -fno-builtin-sin -fno-builtin-cos -fno-builtin-sincos
 EMC2_HOME=@EMC2_HOME@
 RUN_IN_PLACE=@RUN_IN_PLACE@
@@ -130,4 +124,3 @@ endif
 ifeq ($(BUILDSYS),normal)
 $(error Makefile.modinc is only suitable for 'kbuild' kernels and 'uspace' systems)
 endif
-

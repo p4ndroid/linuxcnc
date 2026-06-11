@@ -348,8 +348,7 @@ class _GStat(GObject.GObject):
         self._is_all_homed = False
         self.set_timer()
 
-    # we put this in a function so qtvcp
-    # can override it to fix a seg fault
+    # Keep timer setup isolated for subclasses.
     def set_timer(self):
         GLib.timeout_add(CYCLE_TIME, self.update)
 

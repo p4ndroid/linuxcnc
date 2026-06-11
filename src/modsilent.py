@@ -19,7 +19,7 @@ for line in kbuild.stderr:
     if m and m.group(1) in permitted_duplicates: continue
     linestring = line.decode('utf-8')
 
-    # (rtai) don't complain for symbols in  hal *.comp example
+    # Do not complain for symbols in hal *.comp example
     # files that duplicate symbols from default modules:
     if "jogcomp"  in linestring: continue
     if "homecomp" in linestring: continue

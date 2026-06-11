@@ -70,18 +70,7 @@ as a new command. Anything following '*#*' on a line is a comment.
  Loads a realtime HAL module called _modname_.
  *halcmd* looks for the module in a directory specified at compile time.
 
-In systems with kernel-based realtime support (e.g. RTAI), *halcmd*
-calls the *linuxcnc_module_helper* to load realtime modules.
-*linuxcnc_module_helper* is a setuid program and is compiled with a
-whitelist of modules it is allowed to load. This is currently just a
-list of *LinuxCNC*-related modules. The *linuxcnc_module_helper* execs
-insmod, so return codes and error messages are those from insmod.
-Administrators who wish to restrict which users can load these
-*LinuxCNC*-related kernel modules can do this by setting the permissions
-and group on *linuxcnc_module_helper* appropriately.
-
-In systems with userspace-based realtime support (e.g. Preempt-RT) and
-in systems without realtime support *halcmd* calls the *rtapi_app* which
+*halcmd* calls the *rtapi_app* which
 creates the realtime environment (simulated realtime, on systems with no
 userspace realtime support) if it did not yet exist, and then loads the
 requested component with a call to *dlopen(3)*.
@@ -90,7 +79,7 @@ requested component with a call to *dlopen(3)*.
   (_unload_ __r__eal__t__ime module) Unloads a realtime HAL module
   called _modname_. If _modname_ is "all", it will unload all currently
   loaded realtime HAL modules. *unloadrt* also works by execing
-  *linuxcnc_module_helper* or *rtapi_app*, just like *loadrt*.
+  *rtapi_app*, just like *loadrt*.
 *loadusr* [_flags_] _UNIX-command_::
   (_load_ __Us__e__r__space component) Executes the given
   _UNIX-command_, usually to load a non-realtime component. _[flags]_

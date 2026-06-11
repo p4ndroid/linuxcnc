@@ -313,7 +313,7 @@ or
 sudo apt-get install linuxcnc-dev
 ----
 
-if using RTAI kernel realtime.
+for development headers.
 
 Alternatively the package should be installable with the Synaptic
 package manager.

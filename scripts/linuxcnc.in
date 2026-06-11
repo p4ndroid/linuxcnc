@@ -532,10 +532,6 @@ EMCSERVER=linuxcncsvr
 GetFromIniQuiet HALUI HAL
 HALUI=$retval
 
-# 2.7.1 get halbridge info from INI
-GetFromIniQuiet HALBRIDGE HAL
-HALBRIDGE=$retval
-
 # 2.8. get display information
 GetFromIni DISPLAY DISPLAY
 # Intentional split to make it values of an array.
@@ -545,10 +541,6 @@ __emcdisplay=( $retval )
 EMCDISPLAY="${__emcdisplay[*]:0:1}"
 EMCDISPLAYARGS=( "${__emcdisplay[@]:1}" )
 unset __emcdisplay
-
-case $EMCDISPLAY in
-    tkemc) EMCDISPLAY=tklinuxcnc ;;
-esac
 
 # 2.9. get NML config information
 GetFromIniEx NML_FILE LINUXCNC NML_FILE EMC @DEFAULT_NMLFILE@
@@ -642,7 +634,7 @@ function Cleanup() {
     echo "Shutting down and cleaning up LinuxCNC..."
     # Kill displays first - that should cause an orderly
     #   shutdown of the rest of linuxcnc
-    for KILL_TASK in linuxcncpanel iosh linuxcncsh linuxcncrsh linuxcnctop mdi debuglevel gmoccapy gscreen; do
+    for KILL_TASK in linuxcncpanel iosh linuxcncsh linuxcncrsh linuxcnctop mdi debuglevel; do
 	if $PIDOF $KILL_TASK >> "$DEBUG_FILE" ; then
 	    KillTaskWithTimeout
 	fi
@@ -841,14 +833,6 @@ if [ -n "$HALUI" ] ; then
     $HALCMD loadusr -Wn halui "$HALUI" -ini "$INIFILE"
 fi
 
-# run hal bridge program IF requested
-if [ -n "$HALBRIDGE" ] ; then
-    echo "Starting HAL User Interface program: $HALBRIDGE" >> "$PRINT_FILE"
-    # HALBRIDGE must be word split
-    # shellcheck disable=SC2086
-    $HALCMD loadusr -Wn bridge $HALBRIDGE
-fi
-
 # 4.3.6. execute HALCMD config files (if any)
 
 TWOPASS=$($INIVAR -ini "$INIFILE" -var TWOPASS -sec HAL -num 1 2> /dev/null)
@@ -972,16 +956,6 @@ done
 echo "Starting DISPLAY program: $EMCDISPLAY" >> "$PRINT_FILE"
 result=0
 case $EMCDISPLAY in
-  tklinuxcnc)
-    # tklinuxcnc is in the tcl directory, not the bin directory
-    if [ ! -x "$LINUXCNC_TCL_DIR/$EMCDISPLAY.tcl" ] ; then
-	echo "Can't execute DISPLAY program $LINUXCNC_TCL_DIR/$EMCDISPLAY.tcl ${EMCDISPLAYARGS[*]}"
-	Cleanup
-	exit 1
-    fi
-    "$LINUXCNC_TCL_DIR/$EMCDISPLAY.tcl" -ini "$INIFILE" "${EMCDISPLAYARGS[@]}"
-    result=$?
-  ;;
   dummy)
     # dummy display just waits for <ENTER>
     echo "DUMMY DISPLAY MODULE, press <ENTER> to continue."

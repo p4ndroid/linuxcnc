@@ -18,15 +18,14 @@
  * @file
  * @brief Defines the RTAPI for both realtime and non-realtime code.
  *
- * RTAPI is a library providing a uniform API for several real time operating
- * systems. As of ver 2.0, RTLinux and RTAI are supported.
+ * RTAPI is a library providing a uniform API for LinuxCNC realtime and
+ * non-realtime code. This reduced tree supports the POSIX uspace backend.
  *
  * Defines the RTAPI for both realtime and non-realtime code. This is a change
  * from Rev 2, where the non-realtime (user space) API was defined in ulapi.h
  * and used different function names. The symbols RTAPI and ULAPI are used to
  * determine which mode is being compiled, RTAPI for realtime and ULAPI for
- * non-realtime. The API is implemented in files named @c xxx_rtapi.c, where
- * xxx is the RTOS.
+ * non-realtime. The API is implemented by the uspace RTAPI backend.
 */
 
 /*  Copyright (C) 2003 John Kasunich
@@ -631,8 +630,6 @@ RTAPI_BEGIN_DECLS
  *         negative error code.
  * @note Call only from within user or init/cleanup code, not from realtime
  *       tasks.
- * @note RTAI fifos require \f$(stacksize >= fifosize + 256)\f$ to avoid oops
- *       messages on removal.
  */
     extern int rtapi_fifo_new(int key, int module_id,
 	unsigned long int size, char mode);
@@ -646,19 +643,6 @@ RTAPI_BEGIN_DECLS
  *       tasks.
  */
     extern int rtapi_fifo_delete(int fifo_id, int module_id);
-
-/*  FIFO notes. These comments apply to both read and write functions.
-    A fifo is a character device, an int is typically four bytes long...
-    If less than four bytes are sent to the fifo, expect corrupt data
-    out of the other end !
-    The RTAI programming manual clearly states that the programmer is
-    responsible for the data format and integrity.
-
-    Additional NOTE:  IMHO you should be able to write any amount of
-    data to a fifo, from 1 byte up to (and even beyond) the size of
-    the fifo.  At a future date, the somewhat peculiar RTAI fifos
-    will be replaced with something that works better.   John Kasunich
-*/
 
 /*  NOTE:  The fifo read and write functions operated differently in
     realtime and user space.  The realtime versions do not block,

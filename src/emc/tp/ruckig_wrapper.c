@@ -4,7 +4,7 @@
 *
 *   This file provides a C wrapper around the Cruckig C library
 *   for S-curve trajectory planning in LinuxCNC.
-*   Replaces the C++ Ruckig implementation to enable RTAI kernel builds.
+*   Replaces the C++ Ruckig implementation with a C implementation.
 *
 * License: GPL Version 2
 * System: Linux
