@@ -14,7 +14,7 @@ rather than rewriting queues and IPC inside LinuxCNC.
 ## Platform Prerequisite
 
 Create a standalone platform repository, tentatively
-`/home/jan/projects/mce-platform`.
+`/home/jan/projects/cplatform`.
 
 The extraction should:
 
@@ -93,7 +93,7 @@ For the LinuxCNC follow-up:
 
 ## Assumptions
 
-- `mce-platform` is the default new repo name unless renamed before execution.
+- `cplatform` is the platform repository name.
 - The platform extraction is completed and pinned before LinuxCNC consumes it.
 - The first LinuxCNC target is local AXIS control only.
 - Remote NML compatibility, `halui`, `linuxcncsh`, `emcrsh`, and other legacy
